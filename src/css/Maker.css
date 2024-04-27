@@ -1,0 +1,130 @@
+
+.MakerPage {
+    display: flex;
+    
+    width: 100%;
+    height: 100%;
+}
+
+.MakerSidebar {
+    height: 100%;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    /* filter: blur(4px); */
+    /* background-color: rgba(56, 46, 192, 0.363); */
+    background-image: linear-gradient(0deg, rgb(0, 0, 0, 100) 0%, rgb(255, 255, 255, 0) 100%); 
+}
+
+.MakerSidebarMenu {
+    height: 100%;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    /* filter: blur(4px); */
+    /* background-color: rgba(56, 46, 192, 0.363); */
+    background-image: linear-gradient(0deg, rgb(0, 0, 0, 100) 0%, rgb(255, 255, 255, 0) 100%); 
+}
+
+.mbuttonContainer {
+    height: 300px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+
+}
+
+.button-menu {
+    background-color: rgba(0, 0, 0, 0.301);
+    color: white;
+    text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.button-menu:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+.desc-label {
+    justify-content: center;
+    align-items: center;
+}
+
+
+.optionbox {
+    background-color: rgba(0, 0, 0, 0.30);
+    color: white;
+    border: 0px;
+    height: 25px;
+    outline: 2px solid rgb(112, 112, 112);
+}
+
+.optionbox-full {
+    width: 300px
+}
+
+
+.power-cost-container {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.optionbox-half {
+    width: 125px;
+}
+
+.desc-box {
+    background-color: rgba(0, 0, 0, 0.30);
+    color: white;
+    outline: 2px solid rgb(112, 112, 112);
+
+    height: 200px;
+    width: 367px;
+    resize: none;
+}
+
+.lore-box {
+    background-color: rgba(0, 0, 0, 0.30);
+    color: white;
+    outline: 2px solid rgb(112, 112, 112);
+
+    resize: none;
+}
+
+.text-options {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+    justify-content: space-around;
+}
+
+input:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
+select:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
+
+
+#cardImage {
+    zoom: 50%;
+}
+
+label {
+    color: white;
+}

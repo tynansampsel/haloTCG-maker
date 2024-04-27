@@ -1,0 +1,19 @@
+.ManagePage {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+
+
+.button {
+    background-color: rgba(0, 0, 0, 0.301);
+    color: white;
+    text-align: center;
+}
+
+.button:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
