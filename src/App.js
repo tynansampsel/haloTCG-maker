@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useRef, useState, useEffect } from "react";
 import download from 'downloadjs';
+import JSZip from 'jszip';
 
 import './css/App.css';
 import GeneratorPage from './GeneratorPage.js';
@@ -13,77 +14,133 @@ import ManagePage from './ManagePage.js';
 
 
 function App() {
-	const [currentCardSet, setCurrentCardSet] = useState([]);
-	const [currentCardSetName, setCurrentCardSetName] = useState("");
-	const [cardDepictions, setCardDepictions] = useState([]);
-	const [cd, setCd] = useState("");
+	//const [currentCardSet, setCurrentCardSet] = useState([]);
+	const [cardSetName, setCardSetName] = useState("");
+	// const [cardDepictions, setCardDepictions] = useState([]);
+	//const [cd, setCd] = useState("");
+
+	const [cardData, setCardData] = useState([]);
+	const [imageURLs, setImageURLs] = useState([]);
 
 
-	useEffect(() => {
-		console.log(currentCardSet)
-	}, [currentCardSet, currentCardSetName])
+	// useEffect(() => {
+	// 	console.log(currentCardSet)
+	// }, [currentCardSet, cardSetName])
 
-	const handleCurrentCardSetChange = (newCardSet, name) => {
+
+	const handleUploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
+		//console.log(dataURLs)
+
+		for (const property in newCardSet) {
+			if(property === "metadata"){ continue; }
+
+			newCardSet[property].forEach(card => {
+				console.log(card)
+				let name = card.name
+				name = name.replace(/\s/g,"_")
+				name = name.replace(/'/g,"")
+				name = name.toLowerCase()
+
+				let depiction = dataURLs.findIndex(d => d.name == name)
+				console.log(depiction)
+				dataURLs[depiction].cardId = card.id
+			});
+		}
+
 		console.log("handleCurrentCardSetChange")
 		console.log(newCardSet)
-		setCurrentCardSet(newCardSet)
-		setCurrentCardSetName(name)
+		console.log(dataURLs)
+
+		setCardData(newCardSet)
+		setImageURLs(dataURLs)
+		setCardSetName(newCardSetName)
+
 	}
 
-	const getCurrentCardSet = () => {
+	const downloadCardSetFile = () => {
+		var zip = new JSZip();
 
+		
+		const jsonString = JSON.stringify(cardData);
+		const fileName = prompt("", "cardSet");
+
+		zip.file(`cardData.json`, jsonString)
+
+		imageURLs.map(image => {
+			zip.file(`depictions/${image.name}.png`, dataURItoBlob(image.dataURL))
+		})
+
+		zip.generateAsync({ type: "blob" }).then(function (content) {
+			download(content, `${cardSetName}.zip`);
+		});
+		//download(jsonString, `${fileName}.json`, 'application/json');
 	}
 
-	const updateCardInCurrentSet = (newCard, depictionDataURL) => {
+
+	const dataURItoBlob = (dataURI) => {
+		var byteString = atob(dataURI.split(',')[1]);
+		var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+		var ab = new ArrayBuffer(byteString.length);
+		var ia = new Uint8Array(ab);
+		for (var i = 0; i < byteString.length; i++) {
+			ia[i] = byteString.charCodeAt(i);
+		}
+		var blob = new Blob([ab], { type: mimeString });
+		return blob;
+	}
+
+	const updateCard = (newCard, depictionDataURL) => {
 		console.log(newCard)
-		let set = { ...currentCardSet };
+		let set = { ...cardData };
 
-		let id = currentCardSet[newCard.type].findIndex((c) => c.id == newCard.id);
+		let id = cardData[newCard.type].findIndex((c) => c.id == newCard.id);
 
 		set[newCard.type][id] = newCard
 
-		setCurrentCardSet(set);
+		setCardData(set);
 
-		let d = [...cardDepictions]
-		let did = currentCardSet[newCard.type].findIndex((c) => c.name == newCard.name);
+		let nName = newCard.name
 
-		d[did].dataURL = 
-		d.push({
-			name:newCard.name,
-			dataURL:depictionDataURL
-		})
-		setCardDepictions(d)
+		nName = nName.replace(/\s/g,"_")
+		nName = nName.replace(/'/g,"")
+		nName = nName.toLowerCase()
 
+		setImageURLs([...imageURLs].map(m => {
+			if (m.cardId === newCard.id){
+				return {
+					name: nName,
+					cardId: m.cardId,
+					dataURL: depictionDataURL.dataURL
+				}
+			} else return m
+		}))
 
 		console.log(set)
 	}
 
-	const addCardToCurrentSet = (newCard, depictionDataURL) => {
+	const addCard = (newCard, depictionDataURL) => {
 		console.log(newCard)
+		console.log(depictionDataURL)
 		let uuid = crypto.randomUUID();
 		newCard.id = uuid
-		let set = { ...currentCardSet };
+		let set = { ...cardData };
 		set[newCard.type].push(newCard)
-		setCurrentCardSet(set);
+		setCardData(set);
 		console.log(set)
 
-		let d = [...cardDepictions]
-		d.push({
-			name:newCard.name,
-			dataURL:depictionDataURL
-		})
-		setCardDepictions(d)
+		setImageURLs(prev => [...prev, {
+			name: newCard.name,
+			dataURL: depictionDataURL.dataURL,
+			cardId: uuid
+		}]);
 		return uuid
 	}
 
-	const downloadCurrentCardJSON = () => {
-		const jsonString = JSON.stringify(currentCardSet);
-		const fileName = prompt("", "cardSet");
-		download(jsonString, `${fileName}.json`, 'application/json');
-	}
+
 
 	const createNewCardSet = () => {
-		let cardSet = {
+		const newCardSetName = prompt("", "newCardSet");
+		let newCardData = {
 			"metadata": {},
 			"unit": [ ],
 			"action": [ ],
@@ -94,21 +151,23 @@ function App() {
 			"building": [],
 			"trap": [ ]
 		}
+
+		setCardSetName(`${newCardSetName}`)
 		
-		setCurrentCardSetName("newSet.json")
-		setCurrentCardSet(cardSet)
+		setCardData(newCardData)
+		setImageURLs([])
 	}
 
 	const fixCurrentCardSet = () => {
-		let cardset = currentCardSet
-		for (const property in currentCardSet) {
+		let cardset = cardData
+		for (const property in cardData) {
 			console.log(property)
 
 			if(property === "metadata"){ continue; }
 			console.log("d")
 			console.log(typeof(property))
 
-			cardset[property] = currentCardSet[property].map(c => {
+			cardset[property] = cardData[property].map(c => {
 				if(!("id" in c)){
 					let ca = c
 					ca.id = crypto.randomUUID();
@@ -117,36 +176,41 @@ function App() {
 			})
 		}
 
-		setCurrentCardSet(cardset)
+		setCardData(cardset)
 		console.log(cardset)
+	}
+
+	const getImageURL = (cardId) => {
+		return imageURLs.find(m => m.cardId === cardId)
+	}
+
+	const handleNameChange = (event) => {
+		setCardSetName(event.target.value)
 	}
 
 	return (
 		<React.Fragment>
 			<BrowserRouter>
 				<div id="main-content">
-					<Navbar currentCardSetName={currentCardSetName}/>
+					<Navbar cardSetName={cardSetName} handleNameChange={handleNameChange}/>
 					<Routes>
 						<Route path='/' element={<HomePage />} />
-						<Route path='/generator' element={<GeneratorPage currentCardSet={currentCardSet} />}/>
+						<Route path='/generator' element={<GeneratorPage cardData={cardData} getImageURL={getImageURL} />}/>
 						<Route path='/maker' element={
 							<MakerPage 
-								cd={cd}
-								setCd={setCd}
-								currentCardSet={currentCardSet}
-								updateCardInCurrentSet={updateCardInCurrentSet}
-								addCardToCurrentSet={addCardToCurrentSet}
+								cardData={cardData}
+								updateCard={updateCard}
+								addCard={addCard}
+								getImageURL={getImageURL}
 							/>}
 						/>
 						<Route path='/manage' element=
 							{
 								<ManagePage 
-									setCd={setCd}
 									createNewCardSet={createNewCardSet}
 									fixCurrentCardSet={fixCurrentCardSet}
-									currentCardSet={currentCardSet} 
-									handleCurrentCardSetChange={handleCurrentCardSetChange} 
-									downloadCurrentCardJSON={downloadCurrentCardJSON}
+									handleUploadCardSetFile={handleUploadCardSetFile} 
+									downloadCardSetFile={downloadCardSetFile}
 								/>
 							}
 						/>

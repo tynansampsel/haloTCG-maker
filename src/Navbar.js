@@ -16,7 +16,13 @@ function Navbar(props) {
 			</div>
 			<div className="Navbar_menu_right">
 				<div className="cardSetName">
-					{props.currentCardSetName}
+					<input
+						className='navbar-cardset-name-input'
+						name="name"
+						type="text"
+						value={props.cardSetName}
+						onChange={props.handleNameChange}
+					/>
 				</div>
 				<Link to="/#" className="logo">
 					<img className="logo" src={logo} alt="logo" />

@@ -26,6 +26,7 @@ import displayDescriptionText from './js/displayDescriptionText.js';
 import displayCost from './js/displayCost.js';
 import applyFrame from './js/applyFrame.js';
 import applyDepiction from './js/applyDepiction.js';
+import applyDepictionFromDataURL from './js/applyDepictionFromDataURL.js';
 import applyWaveIcon from './js/applyWaveImage.js';
 import applyText from './js/applyText.js';
 
@@ -51,42 +52,42 @@ function GeneratorPage(props) {
 		{
 			type: "unit",
 			frameType: "unit",
-			cards: props.currentCardSet.unit
+			cards: props.cardData.unit
 		},
 		{
 			type: "action",
 			frameType: "action",
-			cards: props.currentCardSet.action
+			cards: props.cardData.action
 		},
 		{
 			type: "equipment",
 			frameType: "action",
-			cards: props.currentCardSet.equipment
+			cards: props.cardData.equipment
 		},
 		{
 			type: "effect",
 			frameType: "action",
-			cards: props.currentCardSet.effect
+			cards: props.cardData.effect
 		},
 		{
 			type: "token",
 			frameType: "token",
-			cards: props.currentCardSet.token
+			cards: props.cardData.token
 		},
 		{
 			type: "building",
 			frameType: "unit",
-			cards: props.currentCardSet.building
+			cards: props.cardData.building
 		},
 		{
 			type: "hero",
 			frameType: "unit",
-			cards: props.currentCardSet.hero
+			cards: props.cardData.hero
 		},
 		{
 			type: "trap",
 			frameType: "action",
-			cards: props.currentCardSet.trap
+			cards: props.cardData.trap
 		}
 	];
 
@@ -121,7 +122,7 @@ function GeneratorPage(props) {
 		var zip = new JSZip();
 
 		console.log("from download ddddddddddddddddddddddddddd")
-		console.log(props.currentCardSet)
+		console.log(props.cardData)
 
 		for await (let toggle of toggles) {
 			if(!toggle.toggle) continue;
@@ -138,8 +139,11 @@ function GeneratorPage(props) {
 				//const card = unitCards.find((c) => c.name == "Dishonored Stalker")
 				const frame = frameTemplates[card.frame]
 				console.log(frame)
-	
-				await applyDepiction(ctx, card)
+				let imageURL = props.getImageURL(card.id)
+				console.log(imageURL)
+
+
+				await applyDepictionFromDataURL(ctx, imageURL.dataURL)
 				await applyFrame(ctx, card, frame, frameType)
 				await applyWaveIcon(ctx, card, frameType)
 				await displayCost(ctx, card, frameType)

@@ -4,23 +4,44 @@ import abilityDescriptions from './cardData/abilityDescriptions.js';
 import { Editor, EditorState, RichUtils, ContentState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
+import MakerFactionbar from './MakerFactionbar.js';
+
 import './css/App.css';
 import './css/Maker.css';
+
 
 function MakerSidebar(props) {
 	const [cardId, setCardId] = useState("");
 
+	const [depiction, setDepiction] = useState("");
 
 	const [type, setType] = useState("unit");
 	const [name, setName] = useState("");
 	const [power, setPower] = useState(0);
 	const [faction, setFaction] = useState([]);
-	const [wave, setWave] = useState(0);
+	const [wave, setWave] = useState(1);
 	const [version, setVersion] = useState("nan");
 	const [frame, setFrame] = useState("unsc");
 	const [lore, setLore] = useState("");
 	const [cost, setCost] = useState(0);
 	const [selection, setSelection] = useState({ start: 0, end: 0 });
+	const [factionD, setFactionD] = useState([
+		{ name: "UNSC", value: false },
+		{ name: "COVENANT", value: false },
+		{ name: "FLOOD", value: false },
+		{ name: "FORERUNNER", value: false },
+		{ name: "ONI", value: false },
+		{ name: "SANGHEILI", value: false },
+		{ name: "JERALHANAE", value: false },
+		{ name: "HUMAN", value: false },
+		{ name: "UNGGOY", value: false },
+		{ name: "KIGYAR", value: false },
+		{ name: "VEHICLE", value: false },
+		{ name: "HEAVY", value: false },
+		{ name: "LIGHT", value: false }
+	]);
+
+	const [factionBarOpen, setFactionBarOpen] = useState(false);
 
 	const descRef = useRef(null);
 
@@ -30,8 +51,14 @@ function MakerSidebar(props) {
 	//this is parsed for machine to understand
 	const [desc, setDesc] = useState("");
 
+	useEffect(() => {
+		let d = factionD.filter((f) => f.value).map((f) => f.name)
+		setFaction(d)
+	}, [factionD])
 
 	useEffect(() => {
+		console.log("value changed")
+		console.log(depiction)
 		props.handleCardDataChanged({
 			id: cardId,
 			name: "" + name,
@@ -45,11 +72,22 @@ function MakerSidebar(props) {
 			cost: cost,
 			type: type,
 			specials: []
-		})
-	}, [name, power, faction, wave, version, frame, desc, lore, cost, type])
+		}, depiction)
+	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionD, depiction])
 
 	useEffect(() => {
 		setCardId(props.cardId)
+
+		if(props.mode == 'add'){
+			setName('')
+			setDesc('')
+			setWave(1)
+			setCost(0)
+			setLore('')
+			setPower(0)
+			setVersion('0.0')
+			setFrame('unsc')
+		}
 	}, [props.mode])
 
 	const getCard = () => {
@@ -57,12 +95,12 @@ function MakerSidebar(props) {
 
 		let card = {};
 
-		for (const property in props.currentCardSet) {
+		for (const property in props.cardData) {
 			console.log(property)
 
 			if(property === "metadata"){ continue; }
 			
-			card = props.currentCardSet[property].find((c) => c.id == cardId);
+			card = props.cardData[property].find((c) => c.id == cardId);
 			if (card !== undefined){
 				break
 			}
@@ -70,7 +108,6 @@ function MakerSidebar(props) {
 
 		return card
 	}
-
 
 	useEffect(() => {
 		console.log(cardId)
@@ -95,6 +132,10 @@ function MakerSidebar(props) {
 		setPower(card.power)
 		setVersion(card.version)
 		setFrame(card.frame)
+
+		let d = props.getImageURL(cardId)
+		console.log(d)
+		setDepiction(d)
 	}, [cardId])
 
 	const red = (string) => {
@@ -175,12 +216,30 @@ function MakerSidebar(props) {
 			//reader.readAsDataURL(file.files[0]);
 			const dataURL = event.target.result;
 			console.log(file);
-			console.log(dataURL);
-			props.setCd(dataURL)
+			console.log("depiction changed");
+			//console.log(dataURL);
+
+			let nName = name
+
+			nName = nName.replace(/\s/g,"_")
+			nName = nName.replace(/'/g,"")
+			nName = nName.toLowerCase()
+			setDepiction({
+				name: nName,
+				cardId: cardId,
+				dataURL: dataURL
+			})
+			//props.setCd(dataURL)
 		};
 
 
 	}
+
+	const handleSelectChange = (event) => {
+		const selectedValues = Array.from(event.target.selectedOptions, option => option.value);
+		
+		setFaction([selectedValues]);
+	  };
 
 
 	const selecto = (event) => {
@@ -203,6 +262,23 @@ function MakerSidebar(props) {
 	}
 
 
+
+	const handleFactionsChange = (event) => {
+		console.log(event.target.checked)
+
+		setFactionD(prevState => {
+			const index = prevState.findIndex(item => item.name === event.target.name);
+			if (index !== -1) {
+				return [
+					...prevState.slice(0, index),
+					{ ...prevState[index], value: event.target.checked },
+					...prevState.slice(index + 1)
+				];
+			}
+
+			return prevState;
+		});
+	}
 	const makeSelectionBold = () => {
 		let d = desc
 		d = d.slice(0, selection.start) + "{b}" + d.slice(selection.start);
@@ -222,6 +298,10 @@ function MakerSidebar(props) {
 
 	}
 
+	const openFactionBar = () => {
+
+	}
+
 	return (
 		<div className="MakerSidebar">
 			{
@@ -232,13 +312,13 @@ function MakerSidebar(props) {
 								<option key={0} value={""}>none</option>
 							}
 							{
-								Object.keys(props.currentCardSet).map(cardType => (
+								Object.keys(props.cardData).map(cardType => (
 									cardType !== "metadata" ?
 										(
 											<optgroup key={cardType} label={cardType}>
 												{
-													props.currentCardSet[cardType].map((card) => (
-														<option key={name} value={card.id}>{card.name}</option>
+													props.cardData[cardType].map((card, i) => (
+														<option key={i} value={card.id}>{card.name}</option>
 													))
 												}
 											</optgroup>
@@ -253,7 +333,7 @@ function MakerSidebar(props) {
 			}
 
 
-			{console.log("r " + cardId)}
+			{/* {console.log("r " + cardId)} */}
 			{
 				(cardId != "" || props.mode == "add") ?
 					(
@@ -275,13 +355,10 @@ function MakerSidebar(props) {
 								value={name}
 								onChange={handleChange}
 							/></label>
-							<label>FACTION<input
-								className='optionbox optionbox-full'
-								name="faction"
-								type="text"
-								value={faction}
-								onChange={handleChange}
-							/></label>
+							<button className='optionbox optionbox-full' onClick={( () => setFactionBarOpen(!factionBarOpen))}>Faction</button>
+							{
+								factionBarOpen ? <MakerFactionbar handleFactionsChange={handleFactionsChange} factionD={factionD}/> : null
+							}
 							<div className='power-cost-container'>
 								{
 									(type == "unit" || type == "token" || type == "hero") ?
@@ -393,7 +470,10 @@ function MakerSidebar(props) {
 							{
 								(props.mode == "edit") ?
 									(
+										<div className='modeContainer'>
 										<h1 className={`button`} onClick={props.handleCardSave}>Save card</h1>
+										<h1 className={`button`} onClick={props.switchToCreate}>New card</h1>
+										</div>
 									)
 									: null
 							}

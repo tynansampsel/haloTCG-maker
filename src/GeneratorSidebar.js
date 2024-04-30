@@ -68,17 +68,17 @@ function GeneratorSidebar(props) {
 	return (
 		<div className="GeneratorSidebar">
 			<div className="buttonContainer">
-				<h1 className={`button button-toggle${unit && ' toggle-on'}`} onClick={() => handleToggle("unit")}>UNIT</h1>
-				<h1 className={`button button-toggle${action && ' toggle-on'}`} onClick={() => handleToggle("action")}>ACTION</h1>
-				<h1 className={`button button-toggle${equipment && ' toggle-on'}`} onClick={() => handleToggle("equipment")}>EQUIPMENT</h1>
-				<h1 className={`button button-toggle${effect && ' toggle-on'}`} onClick={() => handleToggle("effect")}>EFFECT</h1>
-				<h1 className={`button button-toggle${token && ' toggle-on'}`} onClick={() => handleToggle("token")}>TOKEN</h1>
-				<h1 className={`button button-toggle${hero && ' toggle-on'}`} onClick={() => handleToggle("hero")}>HERO</h1>
-				<h1 className={`button button-toggle${building && ' toggle-on'}`} onClick={() => handleToggle("building")}>BUILDING</h1>
-				<h1 className={`button button-toggle${trap && ' toggle-on'}`} onClick={() => handleToggle("trap")}>TRAP</h1>
+				<h1 className={`generator_button button-toggle${unit && ' toggle-on'}`} onClick={() => handleToggle("unit")}>UNIT</h1>
+				<h1 className={`generator_button button-toggle${action && ' toggle-on'}`} onClick={() => handleToggle("action")}>ACTION</h1>
+				<h1 className={`generator_button button-toggle${equipment && ' toggle-on'}`} onClick={() => handleToggle("equipment")}>EQUIPMENT</h1>
+				<h1 className={`generator_button button-toggle${effect && ' toggle-on'}`} onClick={() => handleToggle("effect")}>EFFECT</h1>
+				<h1 className={`generator_button button-toggle${token && ' toggle-on'}`} onClick={() => handleToggle("token")}>TOKEN</h1>
+				<h1 className={`generator_button button-toggle${hero && ' toggle-on'}`} onClick={() => handleToggle("hero")}>HERO</h1>
+				<h1 className={`generator_button button-toggle${building && ' toggle-on'}`} onClick={() => handleToggle("building")}>BUILDING</h1>
+				<h1 className={`generator_button button-toggle${trap && ' toggle-on'}`} onClick={() => handleToggle("trap")}>TRAP</h1>
 			</div>
-			<h1 className="button button-generate" onClick={() => props.handleGenerateClicked()}>GENERATE</h1>
-			<h1 className="button button-change" onClick={() => props.change()}>SINGULAR</h1>
+			<h1 className="generator_button generator_button-generate" onClick={() => props.handleGenerateClicked()}>GENERATE</h1>
+			<h1 className="generator_button generator_button-change" onClick={() => props.change()}>SINGULAR</h1>
 			{/* <h1 className="button button-change" onClick={() => props.change()}>SINGULAR</h1> */}
 		</div>
 	);

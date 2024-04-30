@@ -36,6 +36,11 @@
 
 }
 
+.modeContainer {
+    display: flex;
+    flex-direction: row;
+}
+
 .button-menu {
     background-color: rgba(0, 0, 0, 0.301);
     color: white;
@@ -127,4 +132,29 @@ select:hover {
 
 label {
     color: white;
+}
+
+.MakerFactionbar {
+    padding-left: 10px;
+    position: fixed;
+    height: 100%;
+    width: 150px;
+    background-image: linear-gradient(0deg, rgb(0, 0, 0, 100) 0%, rgb(255, 255, 255, 0) 150%); 
+    left: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.checkbox {
+    display: flex;
+    flex-direction: row;
+}
+
+.checkbox input {
+    margin-right: 12px;
+}
+
+.checkbox:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
 }

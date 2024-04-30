@@ -37,3 +37,14 @@ a {
     margin-left: 20px;
     /* vertical-align: middle; */
 }
+
+.navbar-cardset-name-input {
+    text-align: right;
+    background-color: rgba(0, 0, 0, 0);
+    color: white;
+    border: none;
+    font-weight: bold;
+
+}
+
+

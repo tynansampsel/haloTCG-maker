@@ -23,6 +23,8 @@ function MakerPage(props) {
 	const [type, setType] = useState("unit");
 	const [mode, setMode] = useState("undecided");
 	const [cardId, setCardId] = useState("");
+	const [depiction, setDepiction] = useState("");
+
 
 	const cardObjects = [ { type: "unit", frameType: "unit" }, { type: "action", frameType: "action" }, { type: "equipment", frameType: "action" }, { type: "effect", frameType: "action" }, { type: "token", frameType: "token" }, { type: "building", frameType: "unit" }, { type: "hero", frameType: "unit" }, { type: "trap", frameType: "action" } ];
 	
@@ -30,8 +32,16 @@ function MakerPage(props) {
 		if(JSON.stringify(cardData) === '{}'){
 			return
 		}
+
 		changeFrame()
 	}, [cardData])
+
+	// useEffect(() => {
+	// 	let d = props.getImageURL(cardId)
+	// 	setDepiction(d)
+	// 	console.log("BEEEEEEEEEEEEEEEEEEEEEEEEEEEP")
+	// 	console.log(d)
+	// }, [cardId])
 
 	const createCanvas = () => {
 		let canvas = document.createElement("canvas")
@@ -59,7 +69,7 @@ function MakerPage(props) {
 		//console.log(frame)
 
 		//await applyDepiction(ctx, card)
-		await applyDepictionFromDataURL(ctx, props.cd)
+		await applyDepictionFromDataURL(ctx, depiction.dataURL)
 		await applyFrame(ctx, card, frame, frameType)
 		await applyWaveIcon(ctx, card, frameType)
 		await displayCost(ctx, card, frameType)
@@ -85,18 +95,23 @@ function MakerPage(props) {
 		return desc
 	}
 
-	const handleCardDataChanged = (newCard) => {
-		//console.log(newCard)
+	const handleCardDataChanged = (newCard, imageURL) => {
+		console.log(imageURL)
 		newCard.desc = checkDesc(newCard.desc);
 		setCardData(newCard)
+		setDepiction(imageURL)
 	}
 
 	const handleCardSave = () => {
-		props.updateCardInCurrentSet(cardData)
+		props.updateCard(cardData, depiction)
+	}
+
+	const switchToCreate = () => {
+		setMode('add')
 	}
 	
 	const handleCardCreate = () => {
-		let uuid = props.addCardToCurrentSet(cardData)
+		let uuid = props.addCard(cardData, depiction)
 		setCardId(uuid)
 		setMode("edit")
 		console.log(uuid)
@@ -119,8 +134,10 @@ function MakerPage(props) {
 						cd={props.cd}
 						setCd={props.setCd}
 						mode={mode}
+						getImageURL={props.getImageURL}
+						switchToCreate={switchToCreate}
 						handleCardSave={handleCardSave}
-						currentCardSet={props.currentCardSet}
+						cardData={props.cardData}
 						cardId={cardId}
 						handleCardCreate={handleCardCreate}
 						handleCardDataChanged={handleCardDataChanged}
