@@ -78,7 +78,7 @@ function MakerSidebar(props) {
 			type: type,
 			specials: specials
 		}, depiction)
-	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionOptions, depiction])
+	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionOptions, depiction, specialsOptions, specials])
 
 	useEffect(() => {
 		setCardId(props.cardId)
@@ -304,10 +304,20 @@ function MakerSidebar(props) {
 								onChange={handleChange}
 							/></label>
 							<label>
-								<button className='optionbox optionbox-full' onClick={( () => setFactionBarOpen(!factionBarOpen))}>Faction</button>
+								<button className={`optionbox optionbox-full${factionBarOpen ? ' optionbox-active' : ""}`} onClick={
+									( () => {
+										setFactionBarOpen(!factionBarOpen)
+										setSpecialsBarOpen(false)
+									}
+									)}>Faction</button>
 							</label>
 							<label>
-								<button className='optionbox optionbox-full' onClick={( () => setSpecialsBarOpen(!specialsBarOpen))}>Specials</button>
+								<button className={`optionbox optionbox-full${specialsBarOpen ? ' optionbox-active' : ""}`} onClick={
+									( () => {
+										setSpecialsBarOpen(!specialsBarOpen)
+										setFactionBarOpen(false)
+									}
+									)}>Specials</button>
 							</label>
 							{
 								factionBarOpen ? <MakerFactionbar handleFactionsChange={handleFactionsChange} factionOptions={factionOptions}/> : null
@@ -361,7 +371,7 @@ function MakerSidebar(props) {
 
 							<label className='desc-label'>DESC<textarea
 								id="descTextArea"
-								className='desc-box'
+								className={`desc-box${specialsOptions[2].value ? ' desc-box-small' : ""}`}
 								name="desc"
 								rows="10"
 								cols="48"

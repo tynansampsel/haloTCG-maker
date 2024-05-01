@@ -62,7 +62,7 @@ function MakerPage(props) {
 		let frameType = cardObject.frameType
 
 		const frame = frameTemplates[card.frame]
-
+		console.log(card.specials)
 		await applyDepictionFromDataURL(ctx, depiction.dataURL)
 		await applyFrame(ctx, card, frame, frameType)
 		await applyWaveIcon(ctx, card, frameType)

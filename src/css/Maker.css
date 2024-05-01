@@ -78,6 +78,10 @@ label {
     width: 300px
 }
 
+.optionbox-active {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
 
 .power-cost-container {
     width: 300px;
@@ -99,6 +103,11 @@ label {
     width: 367px;
     resize: none;
 }
+
+.desc-box-small {
+    font-size: 0.74em;
+}
+
 
 .lore-box {
     background-color: rgba(0, 0, 0, 0.30);
