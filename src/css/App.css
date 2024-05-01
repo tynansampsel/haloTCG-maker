@@ -31,3 +31,13 @@ a:hover {
 	text-decoration: none;
 	font-weight: bold;
 }
+
+.HomePage {
+	color: white;
+	display: flex;
+	flex-direction: column;
+	width: auto;
+	padding-left: 100px;
+	padding-top: 50px;
+	font-size: 1.3em;
+}
