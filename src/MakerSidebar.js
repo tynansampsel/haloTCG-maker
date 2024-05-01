@@ -1,8 +1,6 @@
 import React from 'react';
 import { useRef, useState, useEffect } from "react";
 import abilityDescriptions from './cardData/abilityDescriptions.js';
-import { Editor, EditorState, RichUtils, ContentState } from 'draft-js';
-import 'draft-js/dist/Draft.css';
 
 import MakerFactionbar from './MakerFactionbar.js';
 import MakerSpecialbar from './MakerSpecialbar.js';
@@ -41,6 +39,7 @@ function MakerSidebar(props) {
 		{ name: "HEAVY", value: false },
 		{ name: "LIGHT", value: false }
 	]);
+
 	const [specialsOptions, setSpecialsOptions] = useState([
 		{ name: "small_name", value: false },
 		{ name: "tiny_name", value: false },
@@ -50,12 +49,6 @@ function MakerSidebar(props) {
 	const [factionBarOpen, setFactionBarOpen] = useState(false);
 	const [specialsBarOpen, setSpecialsBarOpen] = useState(false);
 
-	const descRef = useRef(null);
-
-	//this is human readeable
-	const [descEditor, setDescEditor] = useState(EditorState.createEmpty());
-
-	//this is parsed for machine to understand
 	const [desc, setDesc] = useState("");
 
 	useEffect(() => {
@@ -71,8 +64,6 @@ function MakerSidebar(props) {
 	}, [specialsOptions])
 
 	useEffect(() => {
-		console.log("value changed")
-		console.log(depiction)
 		props.handleCardDataChanged({
 			id: cardId,
 			name: "" + name,
@@ -91,7 +82,6 @@ function MakerSidebar(props) {
 
 	useEffect(() => {
 		setCardId(props.cardId)
-
 		if(props.mode == 'add'){
 			setName('')
 			setDesc('')
@@ -105,12 +95,8 @@ function MakerSidebar(props) {
 	}, [props.mode])
 
 	const getCard = () => {
-		console.log(type)
-
 		let card = {};
-
 		for (const property in props.cardData) {
-			console.log(property)
 
 			if(property === "metadata"){ continue; }
 			
@@ -119,26 +105,16 @@ function MakerSidebar(props) {
 				break
 			}
 		}
-
 		return card
 	}
 
 	useEffect(() => {
-		console.log(cardId)
-
 		if (cardId == "") {
-			console.log(cardId)
 			return
 		}
-		console.log("pass")
-
 		let card = getCard();
-
-		console.log(card)
-
-		//setType(card.type)
 		setName(card.name)
-		let value = red(card.desc)
+		let value = GetModifiedDescriptionEditor(card.desc)
 		setDesc(value)
 		setWave(card.wave)
 		setCost(card.cost)
@@ -147,18 +123,16 @@ function MakerSidebar(props) {
 		setVersion(card.version)
 		setFrame(card.frame)
 
-		let d = props.getImageURL(cardId)
-		console.log(d)
-		setDepiction(d)
+		let newDepictionDataURL = props.getImageURL(cardId)
+		setDepiction(newDepictionDataURL)
 	}, [cardId])
 
-	const red = (string) => {
+	const GetModifiedDescriptionEditor = (string) => {
 		for (let ability of abilityDescriptions) {
 			let abilityName = ability.name
 			let abilityDesc = ability.desc
 			abilityName = abilityName.charAt(0).toUpperCase() + abilityName.slice(1);
 			const s = `{${abilityName}}\n`
-			//console.log(abilityName)
 			let regex = new RegExp("{" + abilityName + "}[^$]", "mig")
 
 			if (regex.test(string)) {
@@ -170,16 +144,10 @@ function MakerSidebar(props) {
 		return string
 	}
 
-	const setFactionR = (event) => {
-		console.log(event.target.value)
-	}
-
-
 	const handleChange = (event) => {
 		const target = event.target;
 		const name = target.name;
 		let value = target.value
-		//console.log("SWITCHCHCHCH"+ target.value)
 
 		switch (name) {
 			case "name":
@@ -204,9 +172,7 @@ function MakerSidebar(props) {
 				setFrame(value);
 				break;
 			case "desc":
-				let v = value.substring(descRef.current.selectionStart, descRef.current.selectionEnd)
-				//console.log(v)
-				value = red(value)
+				value = GetModifiedDescriptionEditor(value)
 				setDesc(value);
 				break;
 			case "lore":
@@ -227,111 +193,64 @@ function MakerSidebar(props) {
 		const fileReader = new FileReader();
 		fileReader.readAsDataURL(file);
 		fileReader.onload = (event) => {
-			//reader.readAsDataURL(file.files[0]);
 			const dataURL = event.target.result;
-			console.log(file);
-			console.log("depiction changed");
-			//console.log(dataURL);
 
-			let nName = name
+			let depictionName = name
 
-			nName = nName.replace(/\s/g,"_")
-			nName = nName.replace(/'/g,"")
-			nName = nName.toLowerCase()
+			depictionName = depictionName.replace(/\s/g,"_")
+			depictionName = depictionName.replace(/'/g,"")
+			depictionName = depictionName.toLowerCase()
 			setDepiction({
-				name: nName,
+				name: depictionName,
 				cardId: cardId,
 				dataURL: dataURL
 			})
-			//props.setCd(dataURL)
 		};
-
-
 	}
 
-	const handleSelectChange = (event) => {
-		const selectedValues = Array.from(event.target.selectedOptions, option => option.value);
-		
-		setFaction([selectedValues]);
-	  };
 
-
-	const selecto = (event) => {
-		const target = event.target;
-		const name = target.name;
-		let value = target.value
-
-		const selection = event.target.value.substring(
-			event.target.selectionStart,
-			event.target.selectionEnd,
-		);
-
+	const setSelectionPosition = (event) => {
 		setSelection({
 			start: event.target.selectionStart,
 			end: event.target.selectionEnd
 		})
-
-		//console.log(selection)
-		//console.log(`start:${event.target.selectionStart} end${event.target.selectionEnd}`)
 	}
-
 
 
 	const handleFactionsChange = (event) => {
-		console.log(event.target.checked)
-
-		setFactionOptions(prevState => {
-			const index = prevState.findIndex(item => item.name === event.target.name);
-			if (index !== -1) {
-				return [
-					...prevState.slice(0, index),
-					{ ...prevState[index], value: event.target.checked },
-					...prevState.slice(index + 1)
-				];
-			}
-
-			return prevState;
-		});
+		setFactionOptions([...factionOptions].map(m => {
+			if (m.name === event.target.name){
+				return {
+					name: m.name,
+					value: event.target.checked
+				}
+			} else return m
+		}))
 	}
 
 	const handleSpecialsChange = (event) => {
-		console.log(event.target.checked)
-
-		setSpecialsOptions(prevState => {
-			const index = prevState.findIndex(item => item.name === event.target.name);
-			if (index !== -1) {
-				return [
-					...prevState.slice(0, index),
-					{ ...prevState[index], value: event.target.checked },
-					...prevState.slice(index + 1)
-				];
-			}
-
-			return prevState;
-		});
+		setSpecialsOptions([...specialsOptions].map(m => {
+			if (m.name === event.target.name){
+				return {
+					name: m.name,
+					value: event.target.checked
+				}
+			} else return m
+		}))
 	}
 
 	const makeSelectionBold = () => {
-		let d = desc
-		d = d.slice(0, selection.start) + "{b}" + d.slice(selection.start);
-		d = d.slice(0, selection.end + 3) + "{/b}" + d.slice(selection.end + 3);
-		//console.log(d)
-		setDesc(d);
+		let newDesc = desc
+		newDesc = newDesc.slice(0, selection.start) + "{b}" + newDesc.slice(selection.start);
+		newDesc = newDesc.slice(0, selection.end + 3) + "{/b}" + newDesc.slice(selection.end + 3);
+		setDesc(newDesc);
 	}
 
 	const makeSelectionItalic = () => {
-		let d = desc
-		d = d.slice(0, selection.start) + "{i}" + d.slice(selection.start);
-		d = d.slice(0, selection.end + 3) + "{/i}" + d.slice(selection.end + 3);
-		setDesc(d);
-	}
-
-	const handleCardSave = () => {
-
-	}
-
-	const openFactionBar = () => {
-
+		let newDesc = desc
+		newDesc = newDesc.slice(0, selection.start) + "{i}" + newDesc.slice(selection.start);
+		newDesc = newDesc.slice(0, selection.end + 3) + "{/i}" + newDesc.slice(selection.end + 3);
+		setDesc(newDesc);
 	}
 
 	return (
@@ -363,9 +282,6 @@ function MakerSidebar(props) {
 					)
 					: null
 			}
-
-
-			{/* {console.log("r " + cardId)} */}
 			{
 				(cardId != "" || props.mode == "add") ?
 					(
@@ -449,9 +365,8 @@ function MakerSidebar(props) {
 								name="desc"
 								rows="10"
 								cols="48"
-								ref={descRef}
 								value={desc}
-								onSelect={selecto}
+								onSelect={setSelectionPosition}
 								onChange={handleChange}
 								data-gramm="false"
 								data-gramm_editor="false"

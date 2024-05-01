@@ -9,19 +9,8 @@ import './css/Generator.css';
 
 import GeneratorSidebar from './GeneratorSidebar.js';
 
-import cards from './cardData/cards.js';
 import frameTemplates from './frameTemplates.js';
 
-import unitCards from './cardData/unit_cards.js';
-import actionCards from './cardData/action_cards.js';
-import equipmentCards from './cardData/equipment_cards.js';
-import effectCards from './cardData/effect_cards.js';
-import tokenCards from './cardData/token_cards.js';
-import trapCards from './cardData/trap_cards.js';
-import buildingCards from './cardData/building_cards.js';
-import heroCards from './cardData/hero_cards.js';
-
-import testUnitsCards from './cardData/test_units_cards.js';
 import displayDescriptionText from './js/displayDescriptionText.js';
 import displayCost from './js/displayCost.js';
 import applyFrame from './js/applyFrame.js';
@@ -33,7 +22,6 @@ import applyText from './js/applyText.js';
 
 
 function GeneratorPage(props) {
-	const [frame, setFrame] = useState(new Image());
 	const [toggles, setToggles] = useState([
 		{ toggle: false, name: 'unit' },
 		{ toggle: false, name: 'action' },
@@ -43,10 +31,8 @@ function GeneratorPage(props) {
 		{ toggle: false, name: 'hero' },
 		{ toggle: false, name: 'building' },
 		{ toggle: false, name: 'trap' }
-	  ]);
+	]);
 	const [cardDisplaySrc, setCardDisplaySrc] = useState("");
-
-	//const cardObjects = [ { type: "unit", frameType: "unit", cards: props.currentCardSet.unitCards }, { type: "action", frameType: "action", cards: actionCards }, { type: "equipment", frameType: "action", cards: equipmentCards }, { type: "effect", frameType: "action", cards: effectCards }, { type: "token", frameType: "token", cards: tokenCards }, { type: "building", frameType: "unit", cards: buildingCards }, { type: "hero", frameType: "unit", cards: heroCards }, { type: "trap", frameType: "action", cards: trapCards } ];
 
 	const cardObjects = [
 		{
@@ -91,57 +77,23 @@ function GeneratorPage(props) {
 		}
 	];
 
-	const changeFrame = async () => {
-		let canvas = createCanvas()
-		const ctx = canvas.getContext("2d")
-		var zip = new JSZip();
-
-		//const card = testUnitsCards.find((c) => c.name == "Dishonored Stalker")
-		const card = tokenCards[3]
-		const frame = frameTemplates[card.frame]
-		console.log(frame)
-		const type = "token"
-		const frameType = "token"
-
-		await applyDepiction(ctx, card)
-		await applyFrame(ctx, card, frame, frameType)
-		await applyWaveIcon(ctx, card, frameType)
-		await displayCost(ctx, card, frameType)
-		applyText(ctx, card, frame, type, frameType)
-		await displayDescriptionText(ctx, card, frame, frameType, true)
-
-		console.log("process completed.")
-		console.log("________________________________________________________________")
-		const mdataURL = canvas.toDataURL();
-		setCardDisplaySrc(mdataURL)
-	}
-
 	const downloadCards = async () => {
 		let canvas = createCanvas()
 		const ctx = canvas.getContext("2d")
 		var zip = new JSZip();
 
-		console.log("from download ddddddddddddddddddddddddddd")
-		console.log(props.cardData)
-
 		for await (let toggle of toggles) {
 			if(!toggle.toggle) continue;
 
 			let cardObject = cardObjects.find((c) => c.type == toggle.name);
-			console.log(toggle)
-			console.log(cardObject)
 			let type = cardObject.type
 			let frameType = cardObject.frameType
 			let cards = cardObject.cards;
 
 
 			for await (let card of cards) {
-				//const card = unitCards.find((c) => c.name == "Dishonored Stalker")
 				const frame = frameTemplates[card.frame]
-				console.log(frame)
 				let imageURL = props.getImageURL(card.id)
-				console.log(imageURL)
-
 
 				await applyDepictionFromDataURL(ctx, imageURL.dataURL)
 				await applyFrame(ctx, card, frame, frameType)
@@ -199,8 +151,6 @@ function GeneratorPage(props) {
 	}
 
 	const handleTogglesChanged = (newToggles) => {
-		console.log("clicked")
-		
 		setToggles(
 			[
 				{ toggle: newToggles.unit, name: 'unit' },
@@ -211,14 +161,11 @@ function GeneratorPage(props) {
 				{ toggle: newToggles.hero, name: 'hero' },
 				{ toggle: newToggles.building, name: 'building' },
 				{ toggle: newToggles.trap, name: 'trap' }
-			  ]
+			]
 		)
-		console.log(newToggles)
-
 	}
 
 	const handleGenerateClicked = () => {
-		console.log("generate")
 		downloadCards()
 	}
 
@@ -231,17 +178,6 @@ function GeneratorPage(props) {
 			<div className="imageContainer">
 				<img id="cardImage" src={cardDisplaySrc}></img>
 			</div>
-			
-			{/* <h1 className="button button-change" onClick={changeFrame}>change</h1> */}
-			{/* <h1 className="button button-download" onClick={downloadCards}>Generate</h1>
-			
-			<h1 className="button button-unit" onClick={(() => {downloadCards("unit")})}>unit</h1>
-			<h1 className="button button-action" onClick={(() => {downloadCards("action")})}>action</h1>
-			<h1 className="button button-equipment" onClick={(() => {downloadCards("equipment")})}>equipment</h1>
-			<h1 className="button button-effect" onClick={(() => {downloadCards("effect")})}>effect</h1>
-			<h1 className="button button-token" onClick={(() => {downloadCards("token")})}>token</h1>
-			<h1 className="button button-trap" onClick={(() => {downloadCards("trap")})}>trap</h1>
-			<h1 className="button button-building" onClick={(() => {downloadCards("building")})}>building</h1> */}
 		</div>
 	);
 }

@@ -14,28 +14,15 @@ import ManagePage from './ManagePage.js';
 
 
 function App() {
-	//const [currentCardSet, setCurrentCardSet] = useState([]);
 	const [cardSetName, setCardSetName] = useState("");
-	// const [cardDepictions, setCardDepictions] = useState([]);
-	//const [cd, setCd] = useState("");
-
 	const [cardData, setCardData] = useState([]);
 	const [imageURLs, setImageURLs] = useState([]);
 
-
-	// useEffect(() => {
-	// 	console.log(currentCardSet)
-	// }, [currentCardSet, cardSetName])
-
-
-	const handleUploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
-		//console.log(dataURLs)
-
+	const uploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
 		for (const property in newCardSet) {
 			if(property === "metadata"){ continue; }
 
 			newCardSet[property].forEach(card => {
-				console.log(card)
 				let name = card.name
 				name = name.replace(/\s/g,"_")
 				name = name.replace(/'/g,"")
@@ -46,10 +33,10 @@ function App() {
 				dataURLs[depiction].cardId = card.id
 			});
 		}
-
-		console.log("handleCurrentCardSetChange")
+		console.log("New Card set data")
 		console.log(newCardSet)
 		console.log(dataURLs)
+		console.log("____________________")
 
 		setCardData(newCardSet)
 		setImageURLs(dataURLs)
@@ -73,7 +60,6 @@ function App() {
 		zip.generateAsync({ type: "blob" }).then(function (content) {
 			download(content, `${cardSetName}.zip`);
 		});
-		//download(jsonString, `${fileName}.json`, 'application/json');
 	}
 
 
@@ -90,7 +76,6 @@ function App() {
 	}
 
 	const updateCard = (newCard, depictionDataURL) => {
-		console.log(newCard)
 		let set = { ...cardData };
 
 		let id = cardData[newCard.type].findIndex((c) => c.id == newCard.id);
@@ -119,8 +104,6 @@ function App() {
 	}
 
 	const addCard = (newCard, depictionDataURL) => {
-		console.log(newCard)
-		console.log(depictionDataURL)
 		let uuid = crypto.randomUUID();
 		newCard.id = uuid
 		let set = { ...cardData };
@@ -161,11 +144,7 @@ function App() {
 	const fixCurrentCardSet = () => {
 		let cardset = cardData
 		for (const property in cardData) {
-			console.log(property)
-
 			if(property === "metadata"){ continue; }
-			console.log("d")
-			console.log(typeof(property))
 
 			cardset[property] = cardData[property].map(c => {
 				if(!("id" in c)){
@@ -209,7 +188,7 @@ function App() {
 								<ManagePage 
 									createNewCardSet={createNewCardSet}
 									fixCurrentCardSet={fixCurrentCardSet}
-									handleUploadCardSetFile={handleUploadCardSetFile} 
+									uploadCardSetFile={uploadCardSetFile} 
 									downloadCardSetFile={downloadCardSetFile}
 								/>
 							}

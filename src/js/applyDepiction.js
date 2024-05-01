@@ -14,7 +14,7 @@ const getDepictionPath = (cardName) => {
     cardName = cardName.replace(/\s/g,"_")
     cardName = cardName.replace(/'/g,"")
     cardName = cardName.toLowerCase()
-    console.log(`/img/depictions/${cardName}.png`)
+    //console.log(`/img/depictions/${cardName}.png`)
     let imagePath = `/img/depictions/${cardName}.png`
 
     return imagePath
