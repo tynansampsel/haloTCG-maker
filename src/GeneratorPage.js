@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRef, useState, useEffect } from "react";
-import { toPng } from 'html-to-image';
 import download from 'downloadjs';
 import JSZip from 'jszip';
 

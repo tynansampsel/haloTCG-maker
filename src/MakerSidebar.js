@@ -421,7 +421,7 @@ function MakerSidebar(props) {
 									<option value="1.1" >1.1</option>
 								</select></label>
 							</div>
-							<label className="maker_button">image
+							<label className="maker_button">Image
 								<input className="maker_button" type="file" accept="image/*" onChange={handleImageChange} />
 							</label>
 
