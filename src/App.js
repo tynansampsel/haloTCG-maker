@@ -62,7 +62,7 @@ function App() {
 
 		
 		const jsonString = JSON.stringify(cardData);
-		const fileName = prompt("", "cardSet");
+		//const fileName = prompt("", "cardSet");
 
 		zip.file(`cardData.json`, jsonString)
 

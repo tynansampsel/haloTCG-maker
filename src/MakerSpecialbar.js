@@ -5,24 +5,14 @@ import './css/App.css';
 import './css/Maker.css';
 
 const factionsList = [
-    "UNSC",
-    "COVENANT",
-    "FLOOD",
-    "FORERUNNER",
-    "ONI",
-    "SANGHEILI",
-    "JERALHANAE",
-    "HUMAN",
-    "UNGGOY",
-    "KIGYAR",
-    "VEHICLE",
-    "HEAVY",
-    "LIGHT"
+    "small_name",
+    "tiny_name",
+    "small_desc"
 ]
 
-function MakerFactionbar(props) {
+function MakerSpecialbar(props) {
 	return (
-		<div className="MakerFactionbar">
+		<div className="MakerSpecialbar">
 			{
 				factionsList.map((f, i) => {
 					return (
@@ -30,8 +20,8 @@ function MakerFactionbar(props) {
 							<input
 							type="checkbox"
 							name={f}
-							checked={props.factionOptions[i].value}
-							onChange={props.handleFactionsChange}
+							checked={props.specialsOptions[i].value}
+							onChange={props.handleSpecialsChange}
 							/>
 							{f}
 						</label>
@@ -44,4 +34,4 @@ function MakerFactionbar(props) {
 	);
 }
 
-export default MakerFactionbar;
+export default MakerSpecialbar;

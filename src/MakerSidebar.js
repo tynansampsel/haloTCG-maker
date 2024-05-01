@@ -5,7 +5,7 @@ import { Editor, EditorState, RichUtils, ContentState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 import MakerFactionbar from './MakerFactionbar.js';
-
+import MakerSpecialbar from './MakerSpecialbar.js';
 import './css/App.css';
 import './css/Maker.css';
 
@@ -19,13 +19,14 @@ function MakerSidebar(props) {
 	const [name, setName] = useState("");
 	const [power, setPower] = useState(0);
 	const [faction, setFaction] = useState([]);
+	const [specials, setSpecials] = useState([]);
 	const [wave, setWave] = useState(1);
 	const [version, setVersion] = useState("nan");
 	const [frame, setFrame] = useState("unsc");
 	const [lore, setLore] = useState("");
 	const [cost, setCost] = useState(0);
 	const [selection, setSelection] = useState({ start: 0, end: 0 });
-	const [factionD, setFactionD] = useState([
+	const [factionOptions, setFactionOptions] = useState([
 		{ name: "UNSC", value: false },
 		{ name: "COVENANT", value: false },
 		{ name: "FLOOD", value: false },
@@ -40,8 +41,14 @@ function MakerSidebar(props) {
 		{ name: "HEAVY", value: false },
 		{ name: "LIGHT", value: false }
 	]);
+	const [specialsOptions, setSpecialsOptions] = useState([
+		{ name: "small_name", value: false },
+		{ name: "tiny_name", value: false },
+		{ name: "small_desc", value: false }
+	]);
 
 	const [factionBarOpen, setFactionBarOpen] = useState(false);
+	const [specialsBarOpen, setSpecialsBarOpen] = useState(false);
 
 	const descRef = useRef(null);
 
@@ -52,9 +59,16 @@ function MakerSidebar(props) {
 	const [desc, setDesc] = useState("");
 
 	useEffect(() => {
-		let d = factionD.filter((f) => f.value).map((f) => f.name)
-		setFaction(d)
-	}, [factionD])
+		setFaction(
+			factionOptions.filter((f) => f.value).map((f) => f.name)
+		)
+	}, [factionOptions])
+
+	useEffect(() => {
+		setSpecials(
+			specialsOptions.filter((f) => f.value).map((f) => f.name)
+		)
+	}, [specialsOptions])
 
 	useEffect(() => {
 		console.log("value changed")
@@ -71,9 +85,9 @@ function MakerSidebar(props) {
 			lore: "" + lore,
 			cost: cost,
 			type: type,
-			specials: []
+			specials: specials
 		}, depiction)
-	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionD, depiction])
+	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionOptions, depiction])
 
 	useEffect(() => {
 		setCardId(props.cardId)
@@ -266,7 +280,7 @@ function MakerSidebar(props) {
 	const handleFactionsChange = (event) => {
 		console.log(event.target.checked)
 
-		setFactionD(prevState => {
+		setFactionOptions(prevState => {
 			const index = prevState.findIndex(item => item.name === event.target.name);
 			if (index !== -1) {
 				return [
@@ -279,6 +293,24 @@ function MakerSidebar(props) {
 			return prevState;
 		});
 	}
+
+	const handleSpecialsChange = (event) => {
+		console.log(event.target.checked)
+
+		setSpecialsOptions(prevState => {
+			const index = prevState.findIndex(item => item.name === event.target.name);
+			if (index !== -1) {
+				return [
+					...prevState.slice(0, index),
+					{ ...prevState[index], value: event.target.checked },
+					...prevState.slice(index + 1)
+				];
+			}
+
+			return prevState;
+		});
+	}
+
 	const makeSelectionBold = () => {
 		let d = desc
 		d = d.slice(0, selection.start) + "{b}" + d.slice(selection.start);
@@ -355,9 +387,17 @@ function MakerSidebar(props) {
 								value={name}
 								onChange={handleChange}
 							/></label>
-							<button className='optionbox optionbox-full' onClick={( () => setFactionBarOpen(!factionBarOpen))}>Faction</button>
+							<label>
+								<button className='optionbox optionbox-full' onClick={( () => setFactionBarOpen(!factionBarOpen))}>Faction</button>
+							</label>
+							<label>
+								<button className='optionbox optionbox-full' onClick={( () => setSpecialsBarOpen(!specialsBarOpen))}>Specials</button>
+							</label>
 							{
-								factionBarOpen ? <MakerFactionbar handleFactionsChange={handleFactionsChange} factionD={factionD}/> : null
+								factionBarOpen ? <MakerFactionbar handleFactionsChange={handleFactionsChange} factionOptions={factionOptions}/> : null
+							}
+							{
+								specialsBarOpen ? <MakerSpecialbar handleSpecialsChange={handleSpecialsChange} specialsOptions={specialsOptions}/> : null
 							}
 							<div className='power-cost-container'>
 								{
@@ -456,14 +496,14 @@ function MakerSidebar(props) {
 									<option value="1.1" >1.1</option>
 								</select></label>
 							</div>
-							<label>image
-								<input className="button" type="file" accept="image/*" onChange={handleImageChange} />
+							<label className="maker_button">image
+								<input className="maker_button" type="file" accept="image/*" onChange={handleImageChange} />
 							</label>
 
 							{
 								(props.mode == "add") ?
 									(
-										<h1 className={`button`} onClick={props.handleCardCreate}>Create card</h1>
+										<h1 className="maker_button" onClick={props.handleCardCreate}>Create card</h1>
 									)
 									: null
 							}
@@ -471,8 +511,8 @@ function MakerSidebar(props) {
 								(props.mode == "edit") ?
 									(
 										<div className='modeContainer'>
-										<h1 className={`button`} onClick={props.handleCardSave}>Save card</h1>
-										<h1 className={`button`} onClick={props.switchToCreate}>New card</h1>
+										<h1 className="maker_button" onClick={props.handleCardSave}>Save card</h1>
+										<h1 className="maker_button" onClick={props.switchToCreate}>New card</h1>
 										</div>
 									)
 									: null
