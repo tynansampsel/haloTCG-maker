@@ -17,6 +17,7 @@ function GeneratorSidebar(props) {
 	const [hero, setHero] = useState(false);
 	const [building, setBuilding] = useState(false);
 	const [trap, setTrap] = useState(false);
+	const [cstatic, setCStatic] = useState(false);
 
 	useEffect(() => {
 		props.handleTogglesChanged({
@@ -27,7 +28,8 @@ function GeneratorSidebar(props) {
 			token: token,
 			hero: hero,
 			building: building,
-			trap: trap
+			trap: trap,
+			cstatic: trap
 		})
 	}, [unit,action,equipment,effect,token,hero,building,trap])
 
@@ -61,6 +63,9 @@ function GeneratorSidebar(props) {
 			case "trap":
 				setTrap(!trap)
 				break;
+			case "cstatic":
+				setCStatic(!cstatic)
+				break;
 		}
 	}
 
@@ -76,6 +81,7 @@ function GeneratorSidebar(props) {
 				<h1 className={`generator_button button-toggle${hero && ' toggle-on'}`} onClick={() => handleToggle("hero")}>HERO</h1>
 				<h1 className={`generator_button button-toggle${building && ' toggle-on'}`} onClick={() => handleToggle("building")}>BUILDING</h1>
 				<h1 className={`generator_button button-toggle${trap && ' toggle-on'}`} onClick={() => handleToggle("trap")}>TRAP</h1>
+				<h1 className={`generator_button button-toggle${cstatic && ' toggle-on'}`} onClick={() => handleToggle("cstatic")}>STATIC</h1>
 			</div>
 			<h1 className="generator_button generator_button-generate" onClick={() => props.handleGenerateClicked()}>GENERATE</h1>
 			<h1 className="generator_button generator_button-change" onClick={() => props.change()}>SINGULAR</h1>

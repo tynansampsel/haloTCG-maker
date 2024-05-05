@@ -6,7 +6,8 @@ import MakerFactionbar from './MakerFactionbar.js';
 import MakerSpecialbar from './MakerSpecialbar.js';
 import './css/App.css';
 import './css/Maker.css';
-
+import getDefaultDepiction from './js/getDefaultDepiction.js';
+import * as utils from './js/utils'
 
 function MakerSidebar(props) {
 	const [cardId, setCardId] = useState("");
@@ -37,7 +38,8 @@ function MakerSidebar(props) {
 		{ name: "KIGYAR", value: false },
 		{ name: "VEHICLE", value: false },
 		{ name: "HEAVY", value: false },
-		{ name: "LIGHT", value: false }
+		{ name: "LIGHT", value: false },
+		{ name: "ARTIFACT", value: false }
 	]);
 
 	const [specialsOptions, setSpecialsOptions] = useState([
@@ -63,6 +65,7 @@ function MakerSidebar(props) {
 		)
 	}, [specialsOptions])
 
+	//this sends the new card data every time an input is changed.
 	useEffect(() => {
 		props.handleCardDataChanged({
 			id: cardId,
@@ -80,6 +83,8 @@ function MakerSidebar(props) {
 		}, depiction)
 	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionOptions, depiction, specialsOptions, specials])
 
+
+	//this resets all inputs when the user starts a new card.
 	useEffect(() => {
 		setCardId(props.cardId)
 		if(props.mode == 'add'){
@@ -89,11 +94,56 @@ function MakerSidebar(props) {
 			setCost(0)
 			setLore('')
 			setPower(0)
+
+			setType("unit")
+
+			setFactionOptions([
+				{ name: "UNSC", value: false },
+				{ name: "COVENANT", value: false },
+				{ name: "FLOOD", value: false },
+				{ name: "FORERUNNER", value: false },
+				{ name: "ONI", value: false },
+				{ name: "SANGHEILI", value: false },
+				{ name: "JERALHANAE", value: false },
+				{ name: "HUMAN", value: false },
+				{ name: "UNGGOY", value: false },
+				{ name: "KIGYAR", value: false },
+				{ name: "VEHICLE", value: false },
+				{ name: "HEAVY", value: false },
+				{ name: "LIGHT", value: false },
+				{ name: "ARTIFACT", value: false }
+			])
+			setSpecialsOptions([
+				{ name: "small_name", value: false },
+				{ name: "tiny_name", value: false },
+				{ name: "small_desc", value: false }
+			])
 			setVersion('0.0')
 			setFrame('unsc')
+
+			console.log('beeb')
+
+			let newDepictionDataURL = getDefaultDepiction()
+			//console.log(newDepictionDataURL)
+
+			let depictionName = name
+
+			console.log(utils.cardNameToDepictionName(name))
+
+			depictionName = depictionName.replace(/\s/g,"_")
+			depictionName = depictionName.replace(/'/g,"")
+			depictionName = depictionName.toLowerCase()
+
+			setDepiction({
+				name: utils.cardNameToDepictionName(name),
+				cardId: cardId,
+				dataURL: newDepictionDataURL
+			})
 		}
 	}, [props.mode])
 
+
+	//this returns the current card data from the current card id
 	const getCard = () => {
 		let card = {};
 		for (const property in props.cardData) {
@@ -108,6 +158,7 @@ function MakerSidebar(props) {
 		return card
 	}
 
+	//this runs every time a new card is selected in edit mode.
 	useEffect(() => {
 		if (cardId == "") {
 			return
@@ -116,6 +167,9 @@ function MakerSidebar(props) {
 		setName(card.name)
 		let value = GetModifiedDescriptionEditor(card.desc)
 		setDesc(value)
+
+		setType(card.type)
+
 		setWave(card.wave)
 		setCost(card.cost)
 		setLore(card.lore)
@@ -123,9 +177,44 @@ function MakerSidebar(props) {
 		setVersion(card.version)
 		setFrame(card.frame)
 
+		setFactionOptions([...factionOptions].map(m => {
+			if (card.faction.findIndex(f => f == m.name) >= 0){
+				return {
+					name: m.name,
+					value: true
+				}
+			} else return {
+				name: m.name,
+				value: false
+			}
+		}))
+
+		setSpecialsOptions([...specialsOptions].map(m => {
+			if (card.specials.findIndex(s => s == m.name) >= 0){
+				return {
+					name: m.name,
+					value: true
+				}
+			} else return {
+				name: m.name,
+				value: false
+			}
+		}))
+
 		let newDepictionDataURL = props.getImageURL(cardId)
 		setDepiction(newDepictionDataURL)
 	}, [cardId])
+
+	const getFactionOptionsPreload = (card) => {
+		setFactionOptions([...factionOptions].map(m => {
+			if (card.faction.findIndex(f => f == m.name) >= 0){
+				return {
+					name: m.name,
+					value: true
+				}
+			} else return m
+		}))
+	}
 
 	const GetModifiedDescriptionEditor = (string) => {
 		for (let ability of abilityDescriptions) {
@@ -295,6 +384,7 @@ function MakerSidebar(props) {
 								<option value="hero" >hero</option>
 								<option value="building" >building</option>
 								<option value="trap" >trap</option>
+								<option value="cstatic" >static</option>
 							</select></label>
 							<label>NAME<input
 								className='optionbox optionbox-full'
@@ -417,8 +507,12 @@ function MakerSidebar(props) {
 										: null
 								}
 								<label>VERSION<select value={version} className='optionbox opentionbox-half' onChange={e => setVersion(e.target.value)}>
+									<option value="0.0">0.0</option>
 									<option value="1.0">1.0</option>
 									<option value="1.1" >1.1</option>
+									<option value="1.2" >1.2</option>
+									<option value="1.3" >1.3</option>
+									<option value="1.4" >1.4</option>
 								</select></label>
 							</div>
 							<label className="maker_button">Image
@@ -438,6 +532,7 @@ function MakerSidebar(props) {
 										<div className='modeContainer'>
 										<h1 className="maker_button" onClick={props.handleCardSave}>Save card</h1>
 										<h1 className="maker_button" onClick={props.switchToCreate}>New card</h1>
+										<h1 className="maker_button" onClick={props.handleRemoveCard}>Delete card</h1>
 										</div>
 									)
 									: null

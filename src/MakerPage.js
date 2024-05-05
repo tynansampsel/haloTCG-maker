@@ -26,12 +26,21 @@ function MakerPage(props) {
 	const [depiction, setDepiction] = useState("")
 
 
-	const cardObjects = [ { type: "unit", frameType: "unit" }, { type: "action", frameType: "action" }, { type: "equipment", frameType: "action" }, { type: "effect", frameType: "action" }, { type: "token", frameType: "token" }, { type: "building", frameType: "unit" }, { type: "hero", frameType: "unit" }, { type: "trap", frameType: "action" } ]
-	
+	const cardObjects = [
+		{ type: "unit", frameType: "unit", display: "unit" }, 
+		{ type: "action", frameType: "action", display: "action"  }, 
+		{ type: "equipment", frameType: "action", display: "equipment"  }, 
+		{ type: "effect", frameType: "action", display: "effect"  }, 
+		{ type: "token", frameType: "token", display: "token"  }, 
+		{ type: "building", frameType: "unit", display: "building"  }, 
+		{ type: "hero", frameType: "unit", display: "heroic unit"  }, 
+		{ type: "trap", frameType: "action", display: "trap"  },
+		{ type: "cstatic", frameType: "action", display: "static"  }
+	]
+
 	useEffect(() => {
-		if(JSON.stringify(cardData) === '{}')
-		{ 
-			return 
+		if (JSON.stringify(cardData) === '{}') {
+			return
 		}
 		changeFrame()
 	}, [cardData])
@@ -46,8 +55,7 @@ function MakerPage(props) {
 	}
 
 	const changeFrame = async () => {
-		if(cardData.type == "")
-		{ 
+		if (cardData.type == "") {
 			return
 		}
 
@@ -59,6 +67,7 @@ function MakerPage(props) {
 
 		let cardObject = cardObjects.find((c) => c.type == cardData.type)
 		let type = cardObject.type
+		let displayName = cardObject.display
 		let frameType = cardObject.frameType
 
 		const frame = frameTemplates[card.frame]
@@ -67,7 +76,7 @@ function MakerPage(props) {
 		await applyFrame(ctx, card, frame, frameType)
 		await applyWaveIcon(ctx, card, frameType)
 		await displayCost(ctx, card, frameType)
-		applyText(ctx, card, frame, type, frameType)
+		applyText(ctx, card, frame, displayName, frameType)
 		await displayDescriptionText(ctx, card, frame, frameType, false)
 
 		const mdataURL = canvas.toDataURL()
@@ -78,10 +87,10 @@ function MakerPage(props) {
 
 	const checkDesc = (desc) => {
 
-		if (typeof(desc) != "string") return
+		if (typeof (desc) != "string") return
 
-        const regexNewLine = new RegExp("[\n]","g")
-		desc = desc.replace(regexNewLine,"{n}")
+		const regexNewLine = new RegExp("[\n]", "g")
+		desc = desc.replace(regexNewLine, "{n}")
 
 		return desc
 	}
@@ -96,10 +105,14 @@ function MakerPage(props) {
 		props.updateCard(cardData, depiction)
 	}
 
+	const handleRemoveCard = () => {
+		props.removeCard(cardData)
+	}
+
 	const switchToCreate = () => {
 		setMode('add')
 	}
-	
+
 	const handleCardCreate = () => {
 		let uuid = props.addCard(cardData, depiction)
 		setCardId(uuid)
@@ -110,28 +123,29 @@ function MakerPage(props) {
 		<div className="MakerPage">
 			{
 				mode == "undecided" ?
-				(	
-					<MakerSidebarMenu
+					(
+						<MakerSidebarMenu
 
-						setMode={setMode}
-						handleCardDataChanged={handleCardDataChanged}
-					/> 
-				)
-				:
-				(
-					<MakerSidebar 
-						cd={props.cd}
-						setCd={props.setCd}
-						mode={mode}
-						getImageURL={props.getImageURL}
-						switchToCreate={switchToCreate}
-						handleCardSave={handleCardSave}
-						cardData={props.cardData}
-						cardId={cardId}
-						handleCardCreate={handleCardCreate}
-						handleCardDataChanged={handleCardDataChanged}
-					/>
-				)
+							setMode={setMode}
+							handleCardDataChanged={handleCardDataChanged}
+						/>
+					)
+					:
+					(
+						<MakerSidebar
+							cd={props.cd}
+							setCd={props.setCd}
+							mode={mode}
+							getImageURL={props.getImageURL}
+							switchToCreate={switchToCreate}
+							handleCardSave={handleCardSave}
+							cardData={props.cardData}
+							cardId={cardId}
+							handleCardCreate={handleCardCreate}
+							handleCardDataChanged={handleCardDataChanged}
+							handleRemoveCard={handleRemoveCard}
+						/>
+					)
 			}
 
 			<div className="imageContainer">

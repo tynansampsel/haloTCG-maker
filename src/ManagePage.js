@@ -14,12 +14,18 @@ function ManagePage(props) {
 		zip.loadAsync(event.target.files[0]).then((zip) => {
 			let zipName = event.target.files[0].name
 			zipName = zipName.replace(/[.]\S+$/g, "")
-			zip.file(`${zipName}/hi.txt`).async("string").then((data) => {
-				console.log(data)
-			})
+			// zip.file(`${zipName}/hi.txt`).async("string").then((data) => {
+			// 	console.log(data)
+			// })
+			console.log(zip)
+			console.log(zipName)
+			zip.forEach(function (relativePath, zipEntry) {
+				// Log the filename
+				console.log(relativePath);
+			});
 
 			getImages(zip).then((dataURLs) => {
-				zip.file(`${zipName}/cardData.json`).async("string").then((data) => {
+				zip.file(`cardData.json`).async("string").then((data) => {
 					const newCardSet = JSON.parse(data);
 
 					console.log(zipName)

@@ -17,7 +17,8 @@ const factionsList = [
     "KIGYAR",
     "VEHICLE",
     "HEAVY",
-    "LIGHT"
+    "LIGHT",
+    "ARTIFACT"
 ]
 
 function MakerFactionbar(props) {

@@ -11,6 +11,9 @@ import DeadEndPage from './DeadEndPage.js';
 import HomePage from './HomePage.js';
 import MakerPage from './MakerPage.js';
 import ManagePage from './ManagePage.js';
+import getDefaultDepiction from './js/getDefaultDepiction.js';
+
+import * as utils from './js/utils'
 
 
 function App() {
@@ -19,8 +22,14 @@ function App() {
 	const [imageURLs, setImageURLs] = useState([]);
 
 	const uploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
+
+		let newDep = []
+
 		for (const property in newCardSet) {
 			if(property === "metadata"){ continue; }
+
+			if (!("static" in newCardSet)) newCardSet["static"] = []
+
 
 			newCardSet[property].forEach(card => {
 				let name = card.name
@@ -30,16 +39,26 @@ function App() {
 
 				let depiction = dataURLs.findIndex(d => d.name == name)
 				console.log(depiction)
-				dataURLs[depiction].cardId = card.id
+				if(depiction >= 0) {		
+					dataURLs[depiction].cardId = card.id
+				} else {
+					newDep.push({
+						name: name,
+						dataURL: getDefaultDepiction(),
+						cardId: card.id
+					});
+				}
 			});
 		}
+
 		console.log("New Card set data")
 		console.log(newCardSet)
 		console.log(dataURLs)
 		console.log("____________________")
-
+		
 		setCardData(newCardSet)
 		setImageURLs(dataURLs)
+		setImageURLs(prev => [...prev, ...newDep]);
 		setCardSetName(newCardSetName)
 
 	}
@@ -75,8 +94,30 @@ function App() {
 		return blob;
 	}
 
+	const removeCard = (CardToRemove) => {
+		console.log("removing")
+
+		let set = { ...cardData };
+		let t = CardToRemove.type;
+		let i = CardToRemove.id;
+
+		let id = cardData[t].findIndex((c) => c.id == i);
+
+		set[t].splice(id, 1);
+
+		console.log(set)
+
+
+		setImageURLs([...imageURLs].filter(m => { return m.cardId !== 1}))
+		console.log(imageURLs)
+
+		setCardData(set);
+	}
+
 	const updateCard = (newCard, depictionDataURL) => {
 		let set = { ...cardData };
+
+
 
 		let id = cardData[newCard.type].findIndex((c) => c.id == newCard.id);
 
@@ -84,16 +125,10 @@ function App() {
 
 		setCardData(set);
 
-		let nName = newCard.name
-
-		nName = nName.replace(/\s/g,"_")
-		nName = nName.replace(/'/g,"")
-		nName = nName.toLowerCase()
-
 		setImageURLs([...imageURLs].map(m => {
 			if (m.cardId === newCard.id){
 				return {
-					name: nName,
+					name: utils.cardNameToDepictionName(newCard.name),
 					cardId: m.cardId,
 					dataURL: depictionDataURL.dataURL
 				}
@@ -107,12 +142,15 @@ function App() {
 		let uuid = crypto.randomUUID();
 		newCard.id = uuid
 		let set = { ...cardData };
+
+		if (!(newCard.type in cardData)) set[newCard.type] = []
+
 		set[newCard.type].push(newCard)
 		setCardData(set);
 		console.log(set)
 
 		setImageURLs(prev => [...prev, {
-			name: newCard.name,
+			name: utils.cardNameToDepictionName(newCard.name),
 			dataURL: depictionDataURL.dataURL,
 			cardId: uuid
 		}]);
@@ -132,7 +170,8 @@ function App() {
 			"token": [ ],
 			"hero": [ ],
 			"building": [],
-			"trap": [ ]
+			"trap": [ ],
+			"cstatic": [ ]
 		}
 
 		setCardSetName(`${newCardSetName}`)
@@ -181,6 +220,7 @@ function App() {
 								updateCard={updateCard}
 								addCard={addCard}
 								getImageURL={getImageURL}
+								removeCard={removeCard}
 							/>}
 						/>
 						<Route path='/manage' element=

@@ -86,7 +86,7 @@ const applyText = (ctx, card, frame, type, frametype) => {
         text: type.toUpperCase(),
         fontSize: "20px", 
         font: "Open Sans", 
-        color: "#ffffff", 
+        color: frame.typeColor, 
         style: "bolder",
         x: 50, 
         y: typeY, 

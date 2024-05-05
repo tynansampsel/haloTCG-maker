@@ -29,7 +29,8 @@ function GeneratorPage(props) {
 		{ toggle: false, name: 'token' },
 		{ toggle: false, name: 'hero' },
 		{ toggle: false, name: 'building' },
-		{ toggle: false, name: 'trap' }
+		{ toggle: false, name: 'trap' },
+		{ toggle: false, name: 'cstatic' }
 	]);
 	const [cardDisplaySrc, setCardDisplaySrc] = useState("");
 
@@ -37,42 +38,56 @@ function GeneratorPage(props) {
 		{
 			type: "unit",
 			frameType: "unit",
-			cards: props.cardData.unit
+			cards: props.cardData.unit,
+			display: "unit"
 		},
 		{
 			type: "action",
 			frameType: "action",
-			cards: props.cardData.action
+			cards: props.cardData.action,
+			display: "action"
 		},
 		{
 			type: "equipment",
 			frameType: "action",
-			cards: props.cardData.equipment
+			cards: props.cardData.equipment,
+			display: "equipment"
 		},
 		{
 			type: "effect",
 			frameType: "action",
-			cards: props.cardData.effect
+			cards: props.cardData.effect,
+			display: "effect"
 		},
 		{
 			type: "token",
 			frameType: "token",
-			cards: props.cardData.token
+			cards: props.cardData.token,
+			display: "token"
 		},
 		{
 			type: "building",
 			frameType: "unit",
-			cards: props.cardData.building
+			cards: props.cardData.building,
+			display: "building"
 		},
 		{
 			type: "hero",
 			frameType: "unit",
-			cards: props.cardData.hero
+			cards: props.cardData.hero,
+			display: "heroic unit"
 		},
 		{
 			type: "trap",
 			frameType: "action",
-			cards: props.cardData.trap
+			cards: props.cardData.trap,
+			display: "trap"
+		},
+		{
+			type: "cstatic",
+			frameType: "action",
+			cards: props.cardData.cstatic,
+			display: "static"
 		}
 	];
 
@@ -86,6 +101,7 @@ function GeneratorPage(props) {
 
 			let cardObject = cardObjects.find((c) => c.type == toggle.name);
 			let type = cardObject.type
+			let displayName = cardObject.display
 			let frameType = cardObject.frameType
 			let cards = cardObject.cards;
 
@@ -98,7 +114,7 @@ function GeneratorPage(props) {
 				await applyFrame(ctx, card, frame, frameType)
 				await applyWaveIcon(ctx, card, frameType)
 				await displayCost(ctx, card, frameType)
-				applyText(ctx, card, frame, type, frameType)
+				applyText(ctx, card, frame, displayName, frameType)
 				await displayDescriptionText(ctx, card, frame, frameType, true)
 	
 				const mdataURL = canvas.toDataURL();
@@ -108,7 +124,7 @@ function GeneratorPage(props) {
 		}
 
 		zip.generateAsync({ type: "blob" }).then(function (content) {
-			download(content, 'canvas-cards.zip');
+			download(content, 'haloTCG-Cards.zip');
 		});
 	}
 
@@ -159,7 +175,8 @@ function GeneratorPage(props) {
 				{ toggle: newToggles.token, name: 'token' },
 				{ toggle: newToggles.hero, name: 'hero' },
 				{ toggle: newToggles.building, name: 'building' },
-				{ toggle: newToggles.trap, name: 'trap' }
+				{ toggle: newToggles.trap, name: 'trap' },
+				{ toggle: newToggles.cstatic, name: 'cstatic' }
 			]
 		)
 	}
