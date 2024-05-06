@@ -47,8 +47,8 @@ const frameTemplates = {
 		loreColor: "#474747",
 		powerColor: "#7ffffb",
 	},
-	innie: {
-		image: "innie",
+	insurrectionist: {
+		image: "insurrectionist",
 		nameColor: "#ffffff",
 		typeColor: "#d0d0d0",
 		descColor: "#000000",

@@ -14,7 +14,7 @@ import ManagePage from './ManagePage.js';
 import getDefaultDepiction from './js/getDefaultDepiction.js';
 
 import * as utils from './js/utils'
-
+import fixCardProperites from './js/fixCardProperites.js';
 
 function App() {
 	const [cardSetName, setCardSetName] = useState("");
@@ -24,24 +24,26 @@ function App() {
 	const uploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
 
 		let newDep = []
+		let cardSet = fixCardProperites(newCardSet);
+		console.log(cardSet)
 
-		for (const property in newCardSet) {
+		for (const property in cardSet) {
 			if(property === "metadata"){ continue; }
 
-			if (!("static" in newCardSet)) newCardSet["static"] = []
-
-
-			newCardSet[property].forEach(card => {
+			cardSet[property].forEach(card => {
 				let name = card.name
 				name = name.replace(/\s/g,"_")
 				name = name.replace(/'/g,"")
 				name = name.toLowerCase()
 
 				let depiction = dataURLs.findIndex(d => d.name == name)
-				console.log(depiction)
-				if(depiction >= 0) {		
+				//console.log(depiction)
+				if(depiction >= 0) {
+					console.log(name +" : "+ card.id)
+
 					dataURLs[depiction].cardId = card.id
 				} else {
+					console.log("defaukt")
 					newDep.push({
 						name: name,
 						dataURL: getDefaultDepiction(),
@@ -52,11 +54,11 @@ function App() {
 		}
 
 		console.log("New Card set data")
-		console.log(newCardSet)
+		console.log(cardSet)
 		console.log(dataURLs)
 		console.log("____________________")
 		
-		setCardData(newCardSet)
+		setCardData(cardSet)
 		setImageURLs(dataURLs)
 		setImageURLs(prev => [...prev, ...newDep]);
 		setCardSetName(newCardSetName)
@@ -66,9 +68,10 @@ function App() {
 	const downloadCardSetFile = () => {
 		var zip = new JSZip();
 
-		
+		console.log(cardData)
 		const jsonString = JSON.stringify(cardData);
 		//const fileName = prompt("", "cardSet");
+		console.log(jsonString)
 
 		zip.file(`cardData.json`, jsonString)
 
@@ -199,6 +202,7 @@ function App() {
 	}
 
 	const getImageURL = (cardId) => {
+		console.log(imageURLs)
 		return imageURLs.find(m => m.cardId === cardId)
 	}
 

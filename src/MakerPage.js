@@ -32,7 +32,7 @@ function MakerPage(props) {
 		{ type: "equipment", frameType: "action", display: "equipment"  }, 
 		{ type: "effect", frameType: "action", display: "effect"  }, 
 		{ type: "token", frameType: "token", display: "token"  }, 
-		{ type: "building", frameType: "unit", display: "building"  }, 
+		{ type: "building", frameType: "building", display: "building"  }, 
 		{ type: "hero", frameType: "unit", display: "heroic unit"  }, 
 		{ type: "trap", frameType: "action", display: "trap"  },
 		{ type: "cstatic", frameType: "action", display: "static"  }

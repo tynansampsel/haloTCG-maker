@@ -1,0 +1,152 @@
+{
+	"unit": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "unit",
+            "specials": []
+        }
+	],
+	
+	"token": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "token",
+            "specials": []
+        }
+	],
+
+	"hero": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "hero",
+            "specials": []
+        }
+	],
+
+	"action": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "action",
+            "specials": []
+        }
+	],
+
+
+	"equipment": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "equipment",
+            "specials": []
+        }
+	],
+
+	"effect": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "effect",
+            "specials": []
+        }
+	],
+
+	"building": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "building",
+            "specials": []
+        }
+	],
+	"trap": [
+		{
+            "id": "",
+            "name": "",
+            "power": 0,
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "trap",
+            "specials": []
+        }
+	],
+	"cstatic": [
+		{
+            "id": "",
+            "name": "",
+            "faction": [],
+            "wave": 1,
+            "version": "0.0",
+            "frame": "unsc",
+            "desc": "",
+            "lore": "",
+            "cost": 0,
+            "type": "cstatic",
+            "specials": []
+        }
+	]
+}

@@ -31,6 +31,7 @@ function MakerSidebar(props) {
 		{ name: "FLOOD", value: false },
 		{ name: "FORERUNNER", value: false },
 		{ name: "ONI", value: false },
+		{ name: "INSURRECTIONIST", value: false },
 		{ name: "SANGHEILI", value: false },
 		{ name: "JERALHANAE", value: false },
 		{ name: "HUMAN", value: false },
@@ -103,6 +104,7 @@ function MakerSidebar(props) {
 				{ name: "FLOOD", value: false },
 				{ name: "FORERUNNER", value: false },
 				{ name: "ONI", value: false },
+				{ name: "INSURRECTIONIST", value: false },
 				{ name: "SANGHEILI", value: false },
 				{ name: "JERALHANAE", value: false },
 				{ name: "HUMAN", value: false },
@@ -328,6 +330,11 @@ function MakerSidebar(props) {
 		}))
 	}
 
+	const alteredV = () => {
+		let d = desc.replace(/({n})/g, "\n")
+		return d
+	}
+
 	const makeSelectionBold = () => {
 		let newDesc = desc
 		newDesc = newDesc.slice(0, selection.start) + "{b}" + newDesc.slice(selection.start);
@@ -417,7 +424,7 @@ function MakerSidebar(props) {
 							}
 							<div className='power-cost-container'>
 								{
-									(type == "unit" || type == "token" || type == "hero") ?
+									(type == "unit" || type == "token" || type == "hero" || type == "building") ?
 										(
 											<label>POWER<input
 												className='optionbox optionbox-half'
@@ -453,7 +460,7 @@ function MakerSidebar(props) {
 								<option value="covenant_jeralhanae" >JERALHANAE COVENANT</option>
 								<option value="covenant_sangheili" >SANGHEILI COVENANT</option>
 								<option value="flood" >FLOOD</option>
-								<option value="innie" >INSURECTIONIST</option>
+								<option value="insurrectionist" >INSURRECTIONIST</option>
 								<option value="unsc_oni" >UNSC ONI</option>
 								<option value="forerunner" >FORERUNNER</option>
 								<option value="heretic" >HERETIC</option>
@@ -465,7 +472,7 @@ function MakerSidebar(props) {
 								name="desc"
 								rows="10"
 								cols="48"
-								value={desc}
+								value={alteredV()}
 								onSelect={setSelectionPosition}
 								onChange={handleChange}
 								data-gramm="false"

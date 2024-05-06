@@ -1,7 +1,7 @@
 const displayCost = async (ctx, card, frameType) => {
     return new Promise(async (resolve) => {
         let xorigin = 220
-        if(frameType != "unit") {
+        if(frameType != "unit" && frameType != "building" ) {
             xorigin = 50
         }
         let x = xorigin

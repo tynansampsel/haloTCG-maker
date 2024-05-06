@@ -63,6 +63,21 @@ const applyText = (ctx, card, frame, type, frametype) => {
             textAlign: "center"
         });    
     }
+
+    if(frametype == "building"){
+        applySingleText(ctx, {
+            text: card.power,
+            fontSize: "100px",
+            font: "monospace", 
+            color: frame.powerColor,
+            style: "bolder",
+            x: 140,
+            y: 110,
+            width: 750,
+            textAlign: "center"
+        });    
+    }
+
     if(frametype != "token"){
         applySingleText(ctx, {
             text: card.wave,

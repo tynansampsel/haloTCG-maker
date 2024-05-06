@@ -10,6 +10,7 @@ const factionsList = [
     "FLOOD",
     "FORERUNNER",
     "ONI",
+    "INSURRECTIONIST",
     "SANGHEILI",
     "JERALHANAE",
     "HUMAN",

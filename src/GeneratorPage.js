@@ -67,7 +67,7 @@ function GeneratorPage(props) {
 		},
 		{
 			type: "building",
-			frameType: "unit",
+			frameType: "building",
 			cards: props.cardData.building,
 			display: "building"
 		},
@@ -109,7 +109,9 @@ function GeneratorPage(props) {
 			for await (let card of cards) {
 				const frame = frameTemplates[card.frame]
 				let imageURL = props.getImageURL(card.id)
-
+				console.log(card.name)
+				console.log(card.id)
+				console.log(imageURL)
 				await applyDepictionFromDataURL(ctx, imageURL.dataURL)
 				await applyFrame(ctx, card, frame, frameType)
 				await applyWaveIcon(ctx, card, frameType)
@@ -128,20 +130,6 @@ function GeneratorPage(props) {
 		});
 	}
 
-	const getFrameType = (type) =>{
-		const dict = {
-			unit: "unit",
-			action: "action",
-			equipment: "action",
-			effect: "action",
-			token: "token",
-			hero: "unit",
-			action: "unit",
-			action: "unit",
-			action: "unit",
-			action: "unit",
-		}
-	}
 
 	useEffect(() => {
 	}, [])
