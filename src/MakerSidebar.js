@@ -1,72 +1,79 @@
 import React from 'react';
 import { useRef, useState, useEffect } from "react";
 import abilityDescriptions from './cardData/abilityDescriptions.js';
-
+import { Tooltip } from 'react-tooltip'
 import MakerFactionbar from './MakerFactionbar.js';
 import MakerSpecialbar from './MakerSpecialbar.js';
+import MakerSubtypebar from './MakerSubtypebar.js';
+import MakerSearchOptionsbar from './MakerSearchOptionsbar.js';
 import './css/App.css';
 import './css/Maker.css';
 import getDefaultDepiction from './js/getDefaultDepiction.js';
 import * as utils from './js/utils'
+import * as availableOptions from './js/availableOptions.js'
 
 function MakerSidebar(props) {
 	const [cardId, setCardId] = useState("");
 
 	const [depiction, setDepiction] = useState("");
 
+	const [searchOptionWave, setSearchOptionWave] = useState("any");
+	const [searchOptionFaction, setSearchOptionFaction] = useState("any");
+	//const [searchOptionType, setSearchOptionType] = useState("any");
+	const [searchOptionVersion, setSearchOptionVersion] = useState("any");
+	const [searchOptionRarity, setSearchOptionRarity] = useState("any");
+
 	const [type, setType] = useState("unit");
 	const [name, setName] = useState("");
+	const [nameError, setNameError] = useState(true);
 	const [power, setPower] = useState(0);
 	const [faction, setFaction] = useState([]);
 	const [specials, setSpecials] = useState([]);
+	const [subtype, setSubtype] = useState([]);
 	const [wave, setWave] = useState(1);
 	const [version, setVersion] = useState("nan");
 	const [frame, setFrame] = useState("unsc");
 	const [lore, setLore] = useState("");
 	const [cost, setCost] = useState(0);
-	const [selection, setSelection] = useState({ start: 0, end: 0 });
-	const [factionOptions, setFactionOptions] = useState([
-		{ name: "UNSC", value: false },
-		{ name: "COVENANT", value: false },
-		{ name: "FLOOD", value: false },
-		{ name: "FORERUNNER", value: false },
-		{ name: "ONI", value: false },
-		{ name: "INSURRECTIONIST", value: false },
-		{ name: "SANGHEILI", value: false },
-		{ name: "JERALHANAE", value: false },
-		{ name: "HUMAN", value: false },
-		{ name: "UNGGOY", value: false },
-		{ name: "KIGYAR", value: false },
-		{ name: "VEHICLE", value: false },
-		{ name: "HEAVY", value: false },
-		{ name: "LIGHT", value: false },
-		{ name: "ARTIFACT", value: false }
-	]);
+	const [rarity, setRarity] = useState(0);
 
-	const [specialsOptions, setSpecialsOptions] = useState([
-		{ name: "small_name", value: false },
-		{ name: "tiny_name", value: false },
-		{ name: "small_desc", value: false }
-	]);
+	const [selection, setSelection] = useState({ start: 0, end: 0 });
+	const [factionOptions, setFactionOptions] = useState([...availableOptions.getFactionOptions()]);
+
+	const [specialsOptions, setSpecialsOptions] = useState([...availableOptions.getSpecialsOptions()]);
+
+	const [subtypeOptions, setSubtypeOptions] = useState([...availableOptions.getSubtypeOptions()]);
+
+	// const [searchOptions, setSearchOptions] = useState({
+	// 	wave: 1,
+	// 	factions: availableOptions.getFactionOptions()
+	// });
 
 	const [factionBarOpen, setFactionBarOpen] = useState(false);
 	const [specialsBarOpen, setSpecialsBarOpen] = useState(false);
+	const [subtypeBarOpen, setSubtypeBarOpen] = useState(false);
 
 	const [desc, setDesc] = useState("");
 
+	//this updates faction array with all the selected faction options.
 	useEffect(() => {
-		setFaction(
-			factionOptions.filter((f) => f.value).map((f) => f.name)
-		)
+		setFaction( factionOptions.filter((f) => f.value).map((f) => f.name) )
 	}, [factionOptions])
 
+	//this updates specials array with all the selected specials options.
 	useEffect(() => {
-		setSpecials(
-			specialsOptions.filter((f) => f.value).map((f) => f.name)
-		)
+		setSpecials( specialsOptions.filter((f) => f.value).map((f) => f.name) )
 	}, [specialsOptions])
 
-	//this sends the new card data every time an input is changed.
+	//this updates subtype array with all the selected subtype options.
+	useEffect(() => {
+		console.log(subtypeOptions)
+		setSubtype( subtypeOptions.filter((f) => f.value).map((f) => f.name) )
+	}, [subtypeOptions])
+
+	//this sends the new card data to every time an input is changed.
+	//this effectively saves the current data to the parents copy and refreshes
+	//the displayed card.
 	useEffect(() => {
 		props.handleCardDataChanged({
 			id: cardId,
@@ -80,9 +87,14 @@ function MakerSidebar(props) {
 			lore: "" + lore,
 			cost: cost,
 			type: type,
-			specials: specials
+			specials: specials,
+			rarity: rarity,
+			subtype: subtype
 		}, depiction)
-	}, [name, power, faction, wave, version, frame, desc, lore, cost, type, factionOptions, depiction, specialsOptions, specials])
+	}, [name, power, faction, wave, version, frame, 
+		desc, lore, cost, type, factionOptions, 
+		depiction, specialsOptions, specials, rarity, 
+		subtype, subtypeOptions])
 
 
 	//this resets all inputs when the user starts a new card.
@@ -97,61 +109,28 @@ function MakerSidebar(props) {
 			setPower(0)
 
 			setType("unit")
+			setRarity(0)
 
-			setFactionOptions([
-				{ name: "UNSC", value: false },
-				{ name: "COVENANT", value: false },
-				{ name: "FLOOD", value: false },
-				{ name: "FORERUNNER", value: false },
-				{ name: "ONI", value: false },
-				{ name: "INSURRECTIONIST", value: false },
-				{ name: "SANGHEILI", value: false },
-				{ name: "JERALHANAE", value: false },
-				{ name: "HUMAN", value: false },
-				{ name: "UNGGOY", value: false },
-				{ name: "KIGYAR", value: false },
-				{ name: "VEHICLE", value: false },
-				{ name: "HEAVY", value: false },
-				{ name: "LIGHT", value: false },
-				{ name: "ARTIFACT", value: false }
-			])
-			setSpecialsOptions([
-				{ name: "small_name", value: false },
-				{ name: "tiny_name", value: false },
-				{ name: "small_desc", value: false }
-			])
+			setFactionOptions([...availableOptions.getFactionOptions()])
+
+			setSpecialsOptions([...availableOptions.getSpecialsOptions()])
+			setSubtypeOptions([...availableOptions.getSubtypeOptions()])
 			setVersion('0.0')
 			setFrame('unsc')
-
-			console.log('beeb')
-
-			let newDepictionDataURL = getDefaultDepiction()
-			//console.log(newDepictionDataURL)
-
-			let depictionName = name
-
-			console.log(utils.cardNameToDepictionName(name))
-
-			depictionName = depictionName.replace(/\s/g,"_")
-			depictionName = depictionName.replace(/'/g,"")
-			depictionName = depictionName.toLowerCase()
 
 			setDepiction({
 				name: utils.cardNameToDepictionName(name),
 				cardId: cardId,
-				dataURL: newDepictionDataURL
+				dataURL: getDefaultDepiction()
 			})
 		}
 	}, [props.mode])
-
 
 	//this returns the current card data from the current card id
 	const getCard = () => {
 		let card = {};
 		for (const property in props.cardData) {
-
 			if(property === "metadata"){ continue; }
-			
 			card = props.cardData[property].find((c) => c.id == cardId);
 			if (card !== undefined){
 				break
@@ -178,6 +157,11 @@ function MakerSidebar(props) {
 		setPower(card.power)
 		setVersion(card.version)
 		setFrame(card.frame)
+		setRarity(card.rarity)
+
+		setFaction(card.faction)
+		setSpecials(card.specials)
+		setSubtype(card.subtype)
 
 		setFactionOptions([...factionOptions].map(m => {
 			if (card.faction.findIndex(f => f == m.name) >= 0){
@@ -190,7 +174,6 @@ function MakerSidebar(props) {
 				value: false
 			}
 		}))
-
 		setSpecialsOptions([...specialsOptions].map(m => {
 			if (card.specials.findIndex(s => s == m.name) >= 0){
 				return {
@@ -202,7 +185,17 @@ function MakerSidebar(props) {
 				value: false
 			}
 		}))
-
+		setSubtypeOptions([...subtypeOptions].map(m => {
+			if (card.subtype.findIndex(s => s == m.name) >= 0){
+				return {
+					name: m.name,
+					value: true
+				}
+			} else return {
+				name: m.name,
+				value: false
+			}
+		}))
 		let newDepictionDataURL = props.getImageURL(cardId)
 		setDepiction(newDepictionDataURL)
 	}, [cardId])
@@ -224,24 +217,47 @@ function MakerSidebar(props) {
 			let abilityDesc = ability.desc
 			abilityName = abilityName.charAt(0).toUpperCase() + abilityName.slice(1);
 			const s = `{${abilityName}}\n`
-			let regex = new RegExp("{" + abilityName + "}[^$]", "mig")
+			let regex = new RegExp("{" + abilityName + "}{n}?", "mig") // [^$]
 
 			if (regex.test(string)) {
 				console.log("found ability")
 			}
 			string = string.replace(regex, s)
 		}
-
 		return string
 	}
 
+	//this handles the defocusing of most the options.
+	const handleDefocus = (event) => {
+		const target = event.target;
+		const name = target.name;
+		let value = target.value
+		switch (name) {
+			case "name":
+				const regexLeadAndTrailWhitespace = new RegExp(/(^\s+)|(\s+$)/, "gi")
+				const regexWhitespace = new RegExp(/\s+/, "gi")
+
+				let v = value.replace(regexWhitespace, " ").replace(regexLeadAndTrailWhitespace, "")
+
+				setName(v)
+				break;
+		}
+	}
+
+	//this handles the changing of most the options.
 	const handleChange = (event) => {
 		const target = event.target;
 		const name = target.name;
 		let value = target.value
-
 		switch (name) {
 			case "name":
+				if (props.searchCardForName(value, cardId) || value == ""){
+					console.log("name is taken!")
+					setNameError(true)
+				} else {
+					setNameError(false)
+				}
+				value = value.toLowerCase()
 				setName(value)
 				break;
 			case "power":
@@ -252,7 +268,7 @@ function MakerSidebar(props) {
 				setFaction(value.split(','));
 				break;
 			case "wave":
-				if (value > 3) value = 3
+				if (value > 4) value = 4
 				if (value < 1) value = 1
 				setWave(parseInt(value));
 				break;
@@ -274,12 +290,19 @@ function MakerSidebar(props) {
 				if (value < 0) value = 0
 				setCost(parseInt(value));
 				break;
+			case "rarity":
+				setRarity(parseInt(value));
 		}
 	}
 
 	const handleImageChange = (event) => {
 		const target = event.target;
 		const file = target.files[0]
+
+		if (file === undefined){
+			console.error("File is undefined. This is most likely caused from you clicking the big red X instead of clicking cancel.")
+			return
+		}
 
 		const fileReader = new FileReader();
 		fileReader.readAsDataURL(file);
@@ -319,6 +342,17 @@ function MakerSidebar(props) {
 		}))
 	}
 
+	// const handleSearchFactionsChange = (event) => {
+	// 	setFactionOptions([...factionOptions].map(m => {
+	// 		if (m.name === event.target.name){
+	// 			return {
+	// 				name: m.name,
+	// 				value: event.target.checked
+	// 			}
+	// 		} else return m
+	// 	}))
+	// }
+
 	const handleSpecialsChange = (event) => {
 		setSpecialsOptions([...specialsOptions].map(m => {
 			if (m.name === event.target.name){
@@ -330,11 +364,35 @@ function MakerSidebar(props) {
 		}))
 	}
 
-	const alteredV = () => {
-		let d = desc.replace(/({n})/g, "\n")
-		return d
+	const handleSubtypeChange = (event) => {
+		setSubtypeOptions([...subtypeOptions].map(m => {
+			if (m.name === event.target.name){
+				return {
+					name: m.name,
+					value: event.target.checked
+				}
+			} else return m
+		}))
 	}
 
+	//this function expects a "stored Description" which is the description that will be stored in the json file.
+	//it returns a "Editor Description" which is what is displayed in the editor box.
+	const storedDescToEditorDesc = (pDesc) => {
+		return pDesc.replace(/({n})/g, "\n")
+	}
+
+
+	const handleCardCreate = () => {
+		if(nameError) return
+		props.handleCardCreate()
+	}
+
+	const handleCardSave = () => {
+		if(nameError) return
+		props.handleCardSave()
+	}
+
+	//this makes the currently selected text bold by surrounding it with {b}{/b} tags.
 	const makeSelectionBold = () => {
 		let newDesc = desc
 		newDesc = newDesc.slice(0, selection.start) + "{b}" + newDesc.slice(selection.start);
@@ -342,19 +400,51 @@ function MakerSidebar(props) {
 		setDesc(newDesc);
 	}
 
+	//this makes the currently selected text italic by surrounding it with {i}{/i} tags.
 	const makeSelectionItalic = () => {
 		let newDesc = desc
 		newDesc = newDesc.slice(0, selection.start) + "{i}" + newDesc.slice(selection.start);
 		newDesc = newDesc.slice(0, selection.end + 3) + "{/i}" + newDesc.slice(selection.end + 3);
 		setDesc(newDesc);
 	}
-
+	
 	return (
 		<div className="MakerSidebar">
 			{
 				(props.mode == "edit") ?
 					(
-						<label>Card<select value={cardId} className='optionbox optionbox-full' onChange={e => setCardId(e.target.value)}>
+						<>
+						<div className='search-options-container'>
+							<label><select value={searchOptionWave} className='optionbox optionbox-quarter' onChange={e => setSearchOptionWave(e.target.value)}>
+								<option value="any">-</option>
+								<option value="ordered">ordered</option>
+								<option value="1">Wave 1</option>
+								<option value="2" >wave 2</option>
+								<option value="3" >wave 3</option>
+							</select></label>
+							<label><select value={searchOptionFaction} className='optionbox optionbox-half' onChange={e => setSearchOptionFaction(e.target.value)}>
+								<option value="any">-</option>
+								{ availableOptions.getFactionSelects() }
+							</select></label>
+							<label><select value={searchOptionVersion} id="versionOption" className='optionbox opentionbox-half' onChange={e => setSearchOptionVersion(e.target.value)}>
+								<option value="any">-</option>
+								<option value="0.0">0.0</option>
+								<option value="1.0">1.0</option>
+								<option value="1.1" >1.1</option>
+								<option value="1.2" >1.2</option>
+								<option value="1.3" >1.3</option>
+								<option value="1.4" >1.4</option>
+							</select></label>
+							<label><select value={searchOptionRarity} id="versionOption" className='optionbox opentionbox-half' onChange={e => setSearchOptionRarity(e.target.value)}>
+								<option value="any">-</option>
+								<option value="0">Common</option>
+								<option value="1">Uncommon</option>
+								<option value="2" >Rare</option>
+								<option value="3" >Legendary</option>
+								<option value="4" >Mythic</option>
+							</select></label>
+						</div>
+						<label><select value={cardId} id='currentCardOption' className='optionbox optionbox-full' onChange={e => setCardId(e.target.value)}>
 							{
 								<option key={0} value={""}>none</option>
 							}
@@ -364,7 +454,12 @@ function MakerSidebar(props) {
 										(
 											<optgroup key={cardType} label={cardType}>
 												{
-													props.cardData[cardType].map((card, i) => (
+													props.cardData[cardType]
+													.filter(card => searchOptionVersion == "any" || card.version == searchOptionVersion)
+													.filter(card => searchOptionWave == "any" || card.wave == searchOptionWave)
+													.filter(card => searchOptionFaction == "any" || card.faction.includes(searchOptionFaction))
+													.filter(card => searchOptionRarity == "any" || card.rarity == searchOptionRarity)
+													.map((card, i) => (
 														<option key={i} value={card.id}>{card.name}</option>
 													))
 												}
@@ -375,6 +470,9 @@ function MakerSidebar(props) {
 
 							}
 						</select></label>
+						<br/>
+						<Tooltip anchorSelect="#currentCardOption" place="right">Current Card Being Editted</Tooltip>
+						</>
 					)
 					: null
 			}
@@ -382,7 +480,7 @@ function MakerSidebar(props) {
 				(cardId != "" || props.mode == "add") ?
 					(
 						<>
-							<label>Type<select value={type} className='optionbox optionbox-full' onChange={e => setType(e.target.value)}>
+							<label><select value={type} id="typeOption" className='optionbox optionbox-full' onChange={e => setType(e.target.value)}>
 								<option value="unit">unit</option>
 								<option value="action" >action</option>
 								<option value="equipment" >equipment</option>
@@ -393,18 +491,26 @@ function MakerSidebar(props) {
 								<option value="trap" >trap</option>
 								<option value="cstatic" >static</option>
 							</select></label>
-							<label>NAME<input
-								className='optionbox optionbox-full'
+							<Tooltip anchorSelect="#nameOption" place="right">Card Type</Tooltip>
+
+							<label><input
+								className={'optionbox optionbox-full '+ (nameError && 'optionbox-error')}
 								name="name"
+								id="nameOption"
 								type="text"
 								value={name}
 								onChange={handleChange}
+								onBlur={handleDefocus}
 							/></label>
+							<Tooltip anchorSelect="#nameOption" place="right">Card Name</Tooltip>
+
 							<label>
 								<button className={`optionbox optionbox-full${factionBarOpen ? ' optionbox-active' : ""}`} onClick={
 									( () => {
 										setFactionBarOpen(!factionBarOpen)
 										setSpecialsBarOpen(false)
+										setSubtypeBarOpen(false)
+
 									}
 									)}>Faction</button>
 							</label>
@@ -413,35 +519,55 @@ function MakerSidebar(props) {
 									( () => {
 										setSpecialsBarOpen(!specialsBarOpen)
 										setFactionBarOpen(false)
+										setSubtypeBarOpen(false)
+
 									}
 									)}>Specials</button>
+							</label>
+							<label>
+								<button className={`optionbox optionbox-full${subtypeBarOpen ? ' optionbox-active' : ""}`} onClick={
+									( () => {
+										setSubtypeBarOpen(!subtypeBarOpen)
+										setFactionBarOpen(false)
+										setSpecialsBarOpen(false)
+									}
+									)}>Subtype</button>
 							</label>
 							{
 								factionBarOpen ? <MakerFactionbar handleFactionsChange={handleFactionsChange} factionOptions={factionOptions}/> : null
 							}
 							{
 								specialsBarOpen ? <MakerSpecialbar handleSpecialsChange={handleSpecialsChange} specialsOptions={specialsOptions}/> : null
+							},
+							{
+								subtypeBarOpen ? <MakerSubtypebar handleSubtypeChange={handleSubtypeChange} subtypeOptions={subtypeOptions}/> : null
 							}
 							<div className='power-cost-container'>
 								{
 									(type == "unit" || type == "token" || type == "hero" || type == "building") ?
 										(
-											<label>POWER<input
+											<>
+											<label><input
 												className='optionbox optionbox-half'
 												name="power"
+												id="powerOption"
 												min="0"
 												type="number"
 												value={power}
 												onChange={handleChange}
 											/></label>
+											<Tooltip anchorSelect="#powerOption" place="right">Power</Tooltip>
+											</>
 										)
 										: null
 								}
 								{
 									(type != "token") ?
 										(
-											<label>COST<input
+											<>
+											<label><input
 												name="cost"
+												id="costOption"
 												className='optionbox optionbox-half'
 												min="0"
 												max="8"
@@ -450,11 +576,13 @@ function MakerSidebar(props) {
 												onChange={handleChange}
 											/>
 											</label>
+											<Tooltip anchorSelect="#costOption" place="right">Supply Cost</Tooltip>
+											</>
 										)
 										: null
 								}
 							</div>
-							<label>Frame<select value={frame} className='optionbox optionbox-full' onChange={e => setFrame(e.target.value)}>
+							<label><select value={frame} id="frameOption" className='optionbox optionbox-full' onChange={e => setFrame(e.target.value)}>
 								<option value="unsc">UNSC</option>
 								<option value="covenant" >COVENANT</option>
 								<option value="covenant_jeralhanae" >JERALHANAE COVENANT</option>
@@ -465,14 +593,15 @@ function MakerSidebar(props) {
 								<option value="forerunner" >FORERUNNER</option>
 								<option value="heretic" >HERETIC</option>
 							</select></label>
+							<Tooltip anchorSelect="#frameOption" place="right"> Frame </Tooltip>
 
-							<label className='desc-label'>DESC<textarea
+							<label className='desc-label'><textarea
 								id="descTextArea"
-								className={`desc-box${specialsOptions[2].value ? ' desc-box-small' : ""}`}
+								className={`desc-box${specialsOptions[3].value ? ' desc-box-small' : ""}`}
 								name="desc"
 								rows="10"
 								cols="48"
-								value={alteredV()}
+								value={storedDescToEditorDesc(desc)}
 								onSelect={setSelectionPosition}
 								onChange={handleChange}
 								data-gramm="false"
@@ -480,11 +609,12 @@ function MakerSidebar(props) {
 								data-enable-grammarly="false"
 							>
 							</textarea></label>
+							<Tooltip anchorSelect="#descTextArea" place="right"> Description </Tooltip>
 							<div className='text-options'>
 								<button className='optionbox' onClick={makeSelectionBold}>bold</button>
 								<button className='optionbox' onClick={makeSelectionItalic}>italic</button>
 							</div>
-							<label>LORE<textarea
+							<label><textarea
 								id="LoreTextArea"
 								className='lore-box'
 								name="lore"
@@ -497,23 +627,29 @@ function MakerSidebar(props) {
 								data-enable-grammarly="false"
 							>
 							</textarea></label>
+							<Tooltip anchorSelect="#LoreTextArea" place="right"> Lore </Tooltip>
+
 							<div className='power-cost-container'>
 								{
 									(type != "token") ?
 										(
-											<label>WAVE<input
+											<>
+											<label><input
 												className='optionbox optionbox-half'
 												name="wave"
 												min="1"
 												max="3"
+												id="waveOption"
 												type="number"
 												value={wave}
 												onChange={handleChange}
 											/></label>
+											<Tooltip anchorSelect="#waveOption" place="right"> Wave </Tooltip>
+											</>
 										)
 										: null
 								}
-								<label>VERSION<select value={version} className='optionbox opentionbox-half' onChange={e => setVersion(e.target.value)}>
+								<label><select value={version} id="versionOption" className='optionbox opentionbox-half' onChange={e => setVersion(e.target.value)}>
 									<option value="0.0">0.0</option>
 									<option value="1.0">1.0</option>
 									<option value="1.1" >1.1</option>
@@ -521,6 +657,16 @@ function MakerSidebar(props) {
 									<option value="1.3" >1.3</option>
 									<option value="1.4" >1.4</option>
 								</select></label>
+								<Tooltip anchorSelect="#versionOption" place="right"> Version </Tooltip>
+
+								<label><select value={rarity} id="rarityOption" className='optionbox opentionbox-half' onChange={e => setRarity(parseInt(e.target.value))}>
+									<option value="0">common</option>
+									<option value="1">Uncommon</option>
+									<option value="2" >Rare</option>
+									<option value="3" >Legendary</option>
+									<option value="4" >Mythic</option>
+								</select></label>
+								<Tooltip anchorSelect="#rarityOption" place="right"> Rarity </Tooltip>
 							</div>
 							<label className="maker_button">Image
 								<input className="maker_button" type="file" accept="image/*" onChange={handleImageChange} />
@@ -529,7 +675,7 @@ function MakerSidebar(props) {
 							{
 								(props.mode == "add") ?
 									(
-										<h1 className="maker_button" onClick={props.handleCardCreate}>Create card</h1>
+										<h1 className={"maker_button " + (nameError && ' maker_button_unavailable')} onClick={handleCardCreate}>Create card</h1>
 									)
 									: null
 							}
@@ -537,7 +683,7 @@ function MakerSidebar(props) {
 								(props.mode == "edit") ?
 									(
 										<div className='modeContainer'>
-										<h1 className="maker_button" onClick={props.handleCardSave}>Save card</h1>
+										<h1 className={"maker_button " +( nameError && ' maker_button_unavailable')} onClick={handleCardSave}>Save card</h1>
 										<h1 className="maker_button" onClick={props.switchToCreate}>New card</h1>
 										<h1 className="maker_button" onClick={props.handleRemoveCard}>Delete card</h1>
 										</div>

@@ -1,19 +1,17 @@
-const applyDepictionFromDataURL = (ctx, dataURL) => {
+const applyCardToSheet = (ctx, dataURL, column, row) => {
     return new Promise(async (resolve) => { 
         if(dataURL == "" || dataURL == undefined || dataURL == null) {
-            //console.log("nope")
             resolve()
+            console.log("not an image")
             return
         }
-        // console.log("dod")
-        // console.log(typeof(dataURL))
-        // console.log(dataURL)
         const img = new Image();  
         img.src = dataURL;
         await img.decode()
-        ctx.drawImage(img, 0, 0);
+        //ctx.drawImage(img, 750*column, 1050*row);
+        ctx.drawImage(img, 750*column, 1050*row);
         resolve()
     });
 }
 
-export default applyDepictionFromDataURL
+export default applyCardToSheet

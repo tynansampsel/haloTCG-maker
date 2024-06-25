@@ -11,6 +11,7 @@ import frameTemplates from './frameTemplates.js'
 
 import displayDescriptionText from './js/displayDescriptionText.js'
 import displayCost from './js/displayCost.js'
+import displayRarity from './js/displayRarity.js'
 import applyFrame from './js/applyFrame.js'
 import applyDepiction from './js/applyDepiction.js'
 import applyWaveIcon from './js/applyWaveImage.js'
@@ -71,13 +72,19 @@ function MakerPage(props) {
 		let frameType = cardObject.frameType
 
 		const frame = frameTemplates[card.frame]
-		console.log(card.specials)
+		//console.log(card.specials)
 		await applyDepictionFromDataURL(ctx, depiction.dataURL)
 		await applyFrame(ctx, card, frame, frameType)
 		await applyWaveIcon(ctx, card, frameType)
 		await displayCost(ctx, card, frameType)
-		applyText(ctx, card, frame, displayName, frameType)
+		await displayRarity(ctx, card, frameType)
+		//console.log("A 1")
+
+		await applyText(ctx, card, frame, displayName, frameType)
+		//console.log("A 2")
+
 		await displayDescriptionText(ctx, card, frame, frameType, false)
+		//console.log("A 3")
 
 		const mdataURL = canvas.toDataURL()
 		setCardDisplaySrc(mdataURL)
@@ -144,6 +151,7 @@ function MakerPage(props) {
 							handleCardCreate={handleCardCreate}
 							handleCardDataChanged={handleCardDataChanged}
 							handleRemoveCard={handleRemoveCard}
+							searchCardForName={props.searchCardForName}
 						/>
 					)
 			}

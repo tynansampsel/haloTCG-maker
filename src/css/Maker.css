@@ -97,8 +97,19 @@ label {
     justify-content: space-between;
 }
 
+.search-options-container {
+    width: 300px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
 .optionbox-half {
     width: 125px;
+}
+
+.optionbox-quarter {
+    width: 75px;
 }
 
 .desc-box {
@@ -112,7 +123,7 @@ label {
 }
 
 .desc-box-small {
-    font-size: 0.74em;
+    font-size: 0.96em; /*0.74em*/
 }
 
 
@@ -141,6 +152,15 @@ select:hover {
     box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
 }
 
+.optionbox-error {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(218, 70, 70);
+}
+
+.optionbox-error:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(255, 156, 156);
+}
 
 #cardImage {
     zoom: 50%;
@@ -148,6 +168,7 @@ select:hover {
 
 label {
     color: white;
+    font-size: 0.75em;
 }
 
 .MakerFactionbar {
@@ -161,6 +182,16 @@ label {
     flex-direction: column;
 }
 .MakerSpecialbar {
+    padding-left: 10px;
+    position: fixed;
+    height: 100%;
+    width: 150px;
+    background-image: linear-gradient(0deg, rgb(0, 0, 0, 100) 0%, rgb(255, 255, 255, 0) 150%); 
+    left: 400px;
+    display: flex;
+    flex-direction: column;
+}
+.MakerSubtypebar {
     padding-left: 10px;
     position: fixed;
     height: 100%;
@@ -206,4 +237,13 @@ label {
 .maker_button:hover {
     /* outline: 5px solid black; */
     box-shadow: inset 0px 0px 30px 0px rgb(255, 208, 138);
+}
+
+.maker_button_unavailable {
+    color: rgb(145, 145, 145);
+}
+
+.maker_button_unavailable:hover {
+    /* outline: 5px solid black; */
+    box-shadow: inset 0px 0px 30px 0px rgb(236, 236, 236);
 }

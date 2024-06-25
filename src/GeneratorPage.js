@@ -17,6 +17,8 @@ import applyDepiction from './js/applyDepiction.js';
 import applyDepictionFromDataURL from './js/applyDepictionFromDataURL.js';
 import applyWaveIcon from './js/applyWaveImage.js';
 import applyText from './js/applyText.js';
+import applyCardToSheet from './js/applyCardToSheet.js';
+import displayRarity from './js/displayRarity.js'
 
 
 
@@ -116,12 +118,13 @@ function GeneratorPage(props) {
 				await applyFrame(ctx, card, frame, frameType)
 				await applyWaveIcon(ctx, card, frameType)
 				await displayCost(ctx, card, frameType)
-				applyText(ctx, card, frame, displayName, frameType)
+				await displayRarity(ctx, card, frameType)
+				await applyText(ctx, card, frame, displayName, frameType)
 				await displayDescriptionText(ctx, card, frame, frameType, true)
 	
 				const mdataURL = canvas.toDataURL();
 				setCardDisplaySrc(mdataURL)
-				zip.file(`${card.name}.png`, dataURItoBlob(mdataURL))
+				zip.file(`${card.frame}-${card.type}-${card.name}.png`, dataURItoBlob(mdataURL))
 			}
 		}
 
@@ -129,6 +132,86 @@ function GeneratorPage(props) {
 			download(content, 'haloTCG-Cards.zip');
 		});
 	}
+
+	const downloadCardSheet = async () => {
+
+		let finishedCards = [];
+
+
+		let canvas = createCanvas()
+		const ctx = canvas.getContext("2d")
+		var zip = new JSZip();
+
+		for await (let toggle of toggles) {
+			if(!toggle.toggle) continue;
+
+			let cardObject = cardObjects.find((c) => c.type == toggle.name);
+			let type = cardObject.type
+			let displayName = cardObject.display
+			let frameType = cardObject.frameType
+			let cards = cardObject.cards;
+
+
+			for await (let card of cards) {
+				const frame = frameTemplates[card.frame]
+				let imageURL = props.getImageURL(card.id)
+				console.log(card.name)
+				console.log(card.id)
+				console.log(imageURL)
+				await applyDepictionFromDataURL(ctx, imageURL.dataURL)
+				await applyFrame(ctx, card, frame, frameType)
+				await applyWaveIcon(ctx, card, frameType)
+				await displayCost(ctx, card, frameType)
+				applyText(ctx, card, frame, displayName, frameType)
+				await displayDescriptionText(ctx, card, frame, frameType, true)
+	
+				const mdataURL = canvas.toDataURL();
+				finishedCards.push({
+					cardURL: mdataURL,
+					rarity: card.rarity,
+					wave: card.wave
+				})
+				setCardDisplaySrc(mdataURL)
+				//zip.file(`${card.frame}-${card.type}-${card.name}.png`, dataURItoBlob(mdataURL))
+			}
+		}
+
+		let sheetCanvas = document.createElement("canvas")
+		sheetCanvas.width = 7500 //7x7
+		sheetCanvas.height = 7350
+
+		const sheetCtx = sheetCanvas.getContext("2d")
+
+		sheetCtx.fillStyle = 'black'
+		sheetCtx.fillRect(0,0,7500,7350)
+
+		let column = 0
+		let row = 0
+		for await (let card of finishedCards) {
+			console.log("card applying")
+
+			await applyCardToSheet(sheetCtx, card.cardURL, column, row)
+
+			column++
+			if(column == 10){
+				column = 0;
+				row++;
+			}
+
+			const mdataURL = sheetCanvas.toDataURL();
+
+			//setCardDisplaySrc(mdataURL)
+		}
+
+		const sheetURL = sheetCanvas.toDataURL();
+		zip.file(`sheet.png`, dataURItoBlob(sheetURL))
+
+		zip.generateAsync({ type: "blob" }).then(function (content) {
+			download(content, 'haloTCG-Cards.zip');
+		});
+	}
+
+	
 
 
 	useEffect(() => {
@@ -171,6 +254,7 @@ function GeneratorPage(props) {
 
 	const handleGenerateClicked = () => {
 		downloadCards()
+		//downloadCardSheet()
 	}
 
 	return (

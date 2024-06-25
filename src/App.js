@@ -21,6 +21,44 @@ function App() {
 	const [cardData, setCardData] = useState([]);
 	const [imageURLs, setImageURLs] = useState([]);
 
+
+	const searchCardForName = (nametoSearchFor, cardId) => {
+		for (const property in cardData) {
+			if (property === "metadata") { continue; }
+			//console.log(typeof(property))
+			if (cardData[property].some(c => c.name === nametoSearchFor && c.id != cardId)) {
+				return true
+			}
+		}
+		return false
+	}
+
+	useEffect(() => {
+		const unloadCallback = (event) => {
+			event.preventDefault();
+			event.returnValue = "";
+			return "";
+		};
+
+		window.addEventListener("beforeunload", unloadCallback);
+		return () => window.removeEventListener("beforeunload", unloadCallback);
+	}, []);
+
+
+	useEffect(() => {
+		// if(Object.keys(cardData).length === 0){
+		// 	let storedData = localStorage.getItem("cardData");
+		// 	if(Object.keys(cardData).length === 0){
+		// 		setCardData(storedData)
+		// 	} else {
+		// 		console.log("there is no stored data.")
+		// 	}
+		// } else {
+		// 	const jsonString = JSON.stringify(cardData);
+		// 	localStorage.setItem("cardData", jsonString);
+		// }
+	}, [cardData]);
+
 	const uploadCardSetFile = (newCardSet, dataURLs, newCardSetName) => {
 
 		let newDep = []
@@ -28,24 +66,21 @@ function App() {
 		console.log(cardSet)
 
 		for (const property in cardSet) {
-			if(property === "metadata"){ continue; }
+			if (property === "metadata") { continue; }
 
 			cardSet[property].forEach(card => {
-				let name = card.name
-				name = name.replace(/\s/g,"_")
-				name = name.replace(/'/g,"")
-				name = name.toLowerCase()
+				let cardName = utils.cardNameToDepictionName(card)
 
-				let depiction = dataURLs.findIndex(d => d.name == name)
+				let depiction = dataURLs.findIndex(d => d.name == cardName)
 				//console.log(depiction)
-				if(depiction >= 0) {
-					console.log(name +" : "+ card.id)
+				if (depiction >= 0) {
+					console.log(cardName + " : " + card.id)
 
 					dataURLs[depiction].cardId = card.id
 				} else {
 					console.log("defaukt")
 					newDep.push({
-						name: name,
+						name: cardName,
 						dataURL: getDefaultDepiction(),
 						cardId: card.id
 					});
@@ -57,13 +92,64 @@ function App() {
 		console.log(cardSet)
 		console.log(dataURLs)
 		console.log("____________________")
-		
+
 		setCardData(cardSet)
 		setImageURLs(dataURLs)
 		setImageURLs(prev => [...prev, ...newDep]);
 		setCardSetName(newCardSetName)
-
 	}
+
+	const mergeCardSetFile = (PnewCardSet, dataURLs, newCardSetName) => {
+
+		let newDep = []
+		let newCardSet = fixCardProperites(PnewCardSet);
+		let copyCurrentCardSet = { ...cardData };
+		console.log(newCardSet)
+
+		for (const property in newCardSet) {
+			if (property === "metadata") { continue; }
+
+			newCardSet[property].forEach(newCard => {
+				let cardName = utils.cardNameToDepictionName(newCard)
+
+				let depiction = dataURLs.findIndex(d => d.name == cardName)
+
+				
+
+				if (!(newCard.type in cardData)) copyCurrentCardSet[newCard.type] = [] // create type if it doesn't exist
+				copyCurrentCardSet[newCard.type].push(newCard)
+				
+				console.log(copyCurrentCardSet)
+
+				//console.log(depiction)
+				if (depiction >= 0) {
+					console.log(cardName + " : " + newCard.id)
+
+					dataURLs[depiction].cardId = newCard.id
+				} else {
+					console.log("defaukt")
+					newDep.push({
+						name: cardName,
+						dataURL: getDefaultDepiction(),
+						cardId: newCard.id
+					});
+				}
+			});
+		}
+
+		console.log("New Card set data")
+		console.log(newCardSet)
+		console.log(dataURLs)
+		console.log("____________________")
+
+		setCardData(copyCurrentCardSet);
+		//setCardData(newCardSet)
+		setImageURLs(prev => [...prev, ...dataURLs]) // add images
+		setImageURLs(prev => [...prev, ...newDep]); // add newely create generic images
+	}
+
+
+
 
 	const downloadCardSetFile = () => {
 		var zip = new JSZip();
@@ -71,7 +157,7 @@ function App() {
 		console.log(cardData)
 		const jsonString = JSON.stringify(cardData);
 		//const fileName = prompt("", "cardSet");
-		console.log(jsonString)
+		//console.log(jsonString)
 
 		zip.file(`cardData.json`, jsonString)
 
@@ -111,7 +197,7 @@ function App() {
 		console.log(set)
 
 
-		setImageURLs([...imageURLs].filter(m => { return m.cardId !== 1}))
+		setImageURLs([...imageURLs].filter(m => { return m.cardId !== 1 }))
 		console.log(imageURLs)
 
 		setCardData(set);
@@ -129,9 +215,9 @@ function App() {
 		setCardData(set);
 
 		setImageURLs([...imageURLs].map(m => {
-			if (m.cardId === newCard.id){
+			if (m.cardId === newCard.id) {
 				return {
-					name: utils.cardNameToDepictionName(newCard.name),
+					name: utils.cardNameToDepictionName(newCard),
 					cardId: m.cardId,
 					dataURL: depictionDataURL.dataURL
 				}
@@ -153,7 +239,7 @@ function App() {
 		console.log(set)
 
 		setImageURLs(prev => [...prev, {
-			name: utils.cardNameToDepictionName(newCard.name),
+			name: utils.cardNameToDepictionName(newCard),
 			dataURL: depictionDataURL.dataURL,
 			cardId: uuid
 		}]);
@@ -166,19 +252,19 @@ function App() {
 		const newCardSetName = prompt("", "newCardSet");
 		let newCardData = {
 			"metadata": {},
-			"unit": [ ],
-			"action": [ ],
-			"equipment": [ ],
-			"effect": [ ],
-			"token": [ ],
-			"hero": [ ],
+			"unit": [],
+			"action": [],
+			"equipment": [],
+			"effect": [],
+			"token": [],
+			"hero": [],
 			"building": [],
-			"trap": [ ],
-			"cstatic": [ ]
+			"trap": [],
+			"cstatic": []
 		}
 
 		setCardSetName(`${newCardSetName}`)
-		
+
 		setCardData(newCardData)
 		setImageURLs([])
 	}
@@ -186,14 +272,14 @@ function App() {
 	const fixCurrentCardSet = () => {
 		let cardset = cardData
 		for (const property in cardData) {
-			if(property === "metadata"){ continue; }
+			if (property === "metadata") { continue; }
 
 			cardset[property] = cardData[property].map(c => {
-				if(!("id" in c)){
+				if (!("id" in c)) {
 					let ca = c
 					ca.id = crypto.randomUUID();
 					return ca
-				}else { return c }
+				} else { return c }
 			})
 		}
 
@@ -214,30 +300,32 @@ function App() {
 		<React.Fragment>
 			<BrowserRouter>
 				<div id="main-content">
-					<Navbar cardSetName={cardSetName} handleNameChange={handleNameChange}/>
+					<Navbar cardSetName={cardSetName} handleNameChange={handleNameChange} />
 					<Routes>
 						<Route path='/' element={<HomePage />} />
-						<Route path='/generator' element={<GeneratorPage cardData={cardData} getImageURL={getImageURL} />}/>
+						<Route path='/generator' element={<GeneratorPage cardData={cardData} getImageURL={getImageURL} />} />
 						<Route path='/maker' element={
-							<MakerPage 
+							<MakerPage
 								cardData={cardData}
 								updateCard={updateCard}
 								addCard={addCard}
 								getImageURL={getImageURL}
 								removeCard={removeCard}
+								searchCardForName={searchCardForName}
 							/>}
 						/>
 						<Route path='/manage' element=
 							{
-								<ManagePage 
+								<ManagePage
 									createNewCardSet={createNewCardSet}
 									fixCurrentCardSet={fixCurrentCardSet}
-									uploadCardSetFile={uploadCardSetFile} 
+									uploadCardSetFile={uploadCardSetFile}
 									downloadCardSetFile={downloadCardSetFile}
+									mergeCardSetFile={mergeCardSetFile}
 								/>
 							}
 						/>
-						<Route path='*' element={<DeadEndPage />}/>
+						<Route path='*' element={<DeadEndPage />} />
 					</Routes>
 				</div>
 			</BrowserRouter>

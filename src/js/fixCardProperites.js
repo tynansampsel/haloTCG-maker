@@ -40,7 +40,9 @@ const fixCardProperites = (cardSet) => {
                 "lore": card.lore || "",
                 "cost": card.cost || 0,
                 "type": property,
-                "specials": card.specials || []
+                "specials": card.specials || [],
+                "rarity": card.rarity || 0,
+                "subtype": card.subtype || []
             }
         }); 
     }

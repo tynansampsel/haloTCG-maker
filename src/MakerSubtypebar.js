@@ -6,19 +6,18 @@ import './css/Maker.css';
 
 import * as availableOptions from './js/availableOptions.js'
 
-
-function MakerSpecialbar(props) {
+function MakerSubtypebar(props) {
 	return (
-		<div className="MakerSpecialbar">
+		<div className="MakerSubtypebar">
 			{
-				availableOptions.specials.map((f, i) => {
+				availableOptions.subtypes.map((f, i) => {
 					return (
 						<label className='checkbox' key={i}>
 							<input
-							type="checkbox"
-							name={f}
-							checked={props.specialsOptions[i].value}
-							onChange={props.handleSpecialsChange}
+								type="checkbox"
+								name={f}
+								checked={props.subtypeOptions[i].value}
+								onChange={props.handleSubtypeChange}
 							/>
 							{f}
 						</label>
@@ -26,9 +25,9 @@ function MakerSpecialbar(props) {
 				})
 			}
 
-			
+
 		</div>
 	);
 }
 
-export default MakerSpecialbar;
+export default MakerSubtypebar;

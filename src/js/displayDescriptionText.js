@@ -4,11 +4,16 @@ import convertStringToWordArray from './convertStringToWordArray.js';
 
 const displayDescriptionText = async (ctx, card, frame, frametype, shouldNewLineAbilityTag) => {
     return new Promise(async (resolve) => {
+        //ctx.font = `${textOptions.style} ${textOptions.fontSize} "Tahoma"`
+        //ctx.fillStyle = textOptions.color
+
         let descSize = "28px"
         let descY = 672
         let descLineHeight = 30
         let isSmallDesc = card.specials.includes("small_desc")
+        let isCenterDesc = card.specials.includes("center_desc")
         let supplyIconOffsetY = 24
+        
         if(isSmallDesc){
             descSize = "20px"
             descLineHeight = 24
@@ -27,7 +32,7 @@ const displayDescriptionText = async (ctx, card, frame, frametype, shouldNewLine
         let lineHeight = descLineHeight
 
 
-
+        ctx.textAlign = "start";
         ctx.font = `${fontSize} ${font}`
         ctx.fillStyle = color
 

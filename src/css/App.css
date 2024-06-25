@@ -41,3 +41,19 @@ a:hover {
 	padding-top: 50px;
 	font-size: 1.3em;
 }
+
+
+.WaitBox {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 700px;
+	height: 300px;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 2em;
+    background-color: rgba(0, 0, 0, 0.80);
+}
