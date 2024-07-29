@@ -11,7 +11,7 @@ function ManagePage(props) {
 	const [isImporting, setIsImporting] = useState(false);
 	const [isMerging, setIsMerging] = useState(false);
 	const [isDownloading, setIsDownloading] = useState(false);
-
+//
 
 	const handleChange = async (event) => {
 		setIsImporting(true)
