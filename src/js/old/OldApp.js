@@ -45,35 +45,119 @@ function App() {
 	}, []);
 
 
+	useEffect(() => {
+		// if(Object.keys(cardData).length === 0){
+		// 	let storedData = localStorage.getItem("cardData");
+		// 	if(Object.keys(cardData).length === 0){
+		// 		setCardData(storedData)
+		// 	} else {
+		// 		console.log("there is no stored data.")
+		// 	}
+		// } else {
+		// 	const jsonString = JSON.stringify(cardData);
+		// 	localStorage.setItem("cardData", jsonString);
+		// }
+	}, [cardData]);
+
 	//useNameNotId refers to what is being used to match card data to card depictions. new system uses id but old uses name.
 	const uploadCardSetFile = (newCardSet, dataURLs, newCardSetName, useNameNotId) => {
-		newCardSet = fixCardProperites(newCardSet);
 
-		let {card, depiction } = utils.getCardSetAndDepictionDataURLs({}, newCardSet, dataURLs, useNameNotId)
+		let newDep = []
+		let cardSet = fixCardProperites(newCardSet);
+		console.log(cardSet)
+
+		for (const property in cardSet) {
+			if (property === "metadata") { continue; }
+
+			cardSet[property].forEach(card => {
+				let cardName = useNameNotId ? utils.cardNameToDepictionName(card) : card.name
+
+				console.log(dataURLs)
+
+				//let depiction = dataURLs.findIndex(d => d.card == cardName)
+				let depiction = useNameNotId 
+								? dataURLs.findIndex(d => d.name == cardName) 
+								: dataURLs.findIndex(d => d.cardId == card.cardId)
+				
+				//console.log(depiction)
+				if (depiction >= 0) {
+					console.log(cardName + " : " + card.id)
+
+					dataURLs[depiction].cardId = card.id
+				} else {
+					console.log("defaukt")
+					newDep.push({
+						name: cardName,
+						dataURL: getDefaultDepiction(),
+						cardId: card.id
+					});
+				}
+			});
+		}
+		// console.log(dataURLs)
+		// dataURLs = dataURLs.filter(d => d.id != "")
+		// console.log(dataURLs)
 
 		console.log("New Card set data")
-		console.log(card)
-		console.log(depiction)
+		console.log(cardSet)
+		console.log(dataURLs)
 		console.log("____________________")
 
-		setCardData(card)
-		setImageURLs(depiction)
+		setCardData(cardSet)
+		setImageURLs(dataURLs)
+		setImageURLs(prev => [...prev, ...newDep]);
 		setCardSetName(newCardSetName)
-
 	}
 
-	const mergeCardSetFile = (newCardSet, dataURLs, newCardSetName, useNameNotId) => {
+	const mergeCardSetFile = (PnewCardSet, dataURLs, newCardSetName) => {
 
-		newCardSet = fixCardProperites(newCardSet);
-		let {card, depiction } = utils.getCardSetAndDepictionDataURLs({ ...cardData }, newCardSet, dataURLs, useNameNotId)
+		let newDep = []
+		let newCardSet = fixCardProperites(PnewCardSet);
+		let copyCurrentCardSet = { ...cardData };
+		console.log(newCardSet)
+
+		//search through cards
+		for (const property in newCardSet) {
+			if (property === "metadata") { continue; }
+			newCardSet[property].forEach(newCard => {
+
+
+				let cardName = utils.cardNameToDepictionName(newCard)
+				let depiction = dataURLs.findIndex(d => d.name == cardName)
+
+				if (!(newCard.type in cardData)) copyCurrentCardSet[newCard.type] = [] // create type if it doesn't exist
+				copyCurrentCardSet[newCard.type].push(newCard)
+				
+				console.log(copyCurrentCardSet)
+
+				//console.log(depiction)
+				if (depiction >= 0) {
+					console.log(cardName + " : " + newCard.id)
+
+					dataURLs[depiction].cardId = newCard.id
+				} else {
+					console.log("defaukt")
+					newDep.push({
+						name: cardName,
+						dataURL: getDefaultDepiction(),
+						cardId: newCard.id
+					});
+				}
+
+
+				
+			});
+		}
 
 		console.log("New Card set data")
-		console.log(card)
-		console.log(depiction)
+		console.log(newCardSet)
+		console.log(dataURLs)
 		console.log("____________________")
 
-		setCardData(card)
-		setImageURLs(prev => [...prev, ...depiction]); // add newly create generic images
+		setCardData(copyCurrentCardSet);
+		//setCardData(newCardSet)
+		setImageURLs(prev => [...prev, ...dataURLs]) // add images
+		setImageURLs(prev => [...prev, ...newDep]); // add newely create generic images
 	}
 
 
@@ -100,8 +184,6 @@ function App() {
 			download(content, `${cardSetName}.zip`);
 		});
 	}
-
-	
 
 
 	const dataURItoBlob = (dataURI) => {
@@ -136,44 +218,16 @@ function App() {
 		setCardData(set);
 	}
 
-	const getTypeAndIndexFromId = (id) => {
-		for (const property in cardData) {
-			if (property === "metadata") { continue; }
-			//console.log(typeof(property))
-			let index = cardData[property].findIndex((c) => c.id == id)
-
-			if (index > -1){
-				return {type: property, index: index}
-			}
-		}
-	}
-
 	const updateCard = (newCard, depictionDataURL) => {
 		let set = { ...cardData };
 
-		//let typeChange = set[newCard.type][id] != newCard.type
 
-		//update so it only uses id, not index or type
-		//let id = cardData[newCard.type].findIndex((c) => c.id == newCard.id);
 
-		let keyObject = getTypeAndIndexFromId(newCard.id)
+		let id = cardData[newCard.type].findIndex((c) => c.id == newCard.id);
 
-		let oldCard = set[keyObject.type][keyObject.index]
-		if (oldCard.type != newCard.type){
-			console.log("you changed the type!!!!!!!!!!")
-			set[keyObject.type].splice(keyObject.index, 1)
-			set[newCard.type].push(newCard)
-		} else {
-			set[keyObject.type][keyObject.index] = newCard
-		}
-
-		//set[newCard.type][id] = newCard
-
-		
+		set[newCard.type][id] = newCard
 
 		setCardData(set);
-
-
 
 		setImageURLs([...imageURLs].map(m => {
 			if (m.cardId === newCard.id) {
@@ -186,10 +240,6 @@ function App() {
 		}))
 
 		console.log(set)
-	}
-
-	const changeCardType = () => {
-
 	}
 
 	const addCard = (newCard, depictionDataURL) => {

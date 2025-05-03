@@ -42,7 +42,8 @@ const fixCardProperites = (cardSet) => {
                 "type": property,
                 "specials": card.specials || [],
                 "rarity": card.rarity || 0,
-                "subtype": card.subtype || []
+                "subtype": card.subtype || [],
+                "archetype": card.archetype || 0
             }
         }); 
     }

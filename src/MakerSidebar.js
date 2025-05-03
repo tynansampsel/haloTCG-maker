@@ -36,6 +36,7 @@ function MakerSidebar(props) {
 	const [lore, setLore] = useState("");
 	const [cost, setCost] = useState(0);
 	const [rarity, setRarity] = useState(0);
+	const [archetype, setArchetype] = useState(0);
 
 	const [selection, setSelection] = useState({ start: 0, end: 0 });
 	const [factionOptions, setFactionOptions] = useState([...availableOptions.getFactionOptions()]);
@@ -67,7 +68,7 @@ function MakerSidebar(props) {
 
 	//this updates subtype array with all the selected subtype options.
 	useEffect(() => {
-		console.log(subtypeOptions)
+		//console.log(subtypeOptions)
 		setSubtype( subtypeOptions.filter((f) => f.value).map((f) => f.name) )
 	}, [subtypeOptions])
 
@@ -89,12 +90,13 @@ function MakerSidebar(props) {
 			type: type,
 			specials: specials,
 			rarity: rarity,
-			subtype: subtype
+			subtype: subtype,
+			archetype: archetype
 		}, depiction)
 	}, [name, power, faction, wave, version, frame, 
 		desc, lore, cost, type, factionOptions, 
 		depiction, specialsOptions, specials, rarity, 
-		subtype, subtypeOptions])
+		subtype, subtypeOptions, archetype])
 
 
 	//this resets all inputs when the user starts a new card.
@@ -162,6 +164,7 @@ function MakerSidebar(props) {
 		setFaction(card.faction)
 		setSpecials(card.specials)
 		setSubtype(card.subtype)
+		setArchetype(card.archetype)
 
 		setFactionOptions([...factionOptions].map(m => {
 			if (card.faction.findIndex(f => f == m.name) >= 0){
@@ -407,6 +410,10 @@ function MakerSidebar(props) {
 		newDesc = newDesc.slice(0, selection.end + 3) + "{/i}" + newDesc.slice(selection.end + 3);
 		setDesc(newDesc);
 	}
+
+	const changeType = (e, newType) => {
+		setType(newType)
+	}
 	
 	return (
 		<div className="MakerSidebar">
@@ -480,7 +487,7 @@ function MakerSidebar(props) {
 				(cardId != "" || props.mode == "add") ?
 					(
 						<>
-							<label><select value={type} id="typeOption" className='optionbox optionbox-full' onChange={e => setType(e.target.value)}>
+							<label><select value={type} id="typeOption" className='optionbox optionbox-full' onChange={e => changeType(e, e.target.value)}>
 								<option value="unit">unit</option>
 								<option value="action" >action</option>
 								<option value="equipment" >equipment</option>
@@ -542,6 +549,40 @@ function MakerSidebar(props) {
 							{
 								subtypeBarOpen ? <MakerSubtypebar handleSubtypeChange={handleSubtypeChange} subtypeOptions={subtypeOptions}/> : null
 							}
+
+
+							<div className='archetype-container'>
+								{
+									(type == "unit" || type == "token" || type == "hero") ?
+										(
+											<>
+											<button 
+												className={`optionbox optionbox-half${archetype == 0 ? ' optionbox-active' : ""}`} 
+												id="archetypeInfantryOption"
+												onClick={
+													( () => {
+														setArchetype(0)
+													}
+													)
+												}>Infantry</button>
+											<Tooltip anchorSelect="#archetypeInfantryOption" place="right">Archetype</Tooltip>
+
+											<button 
+												className={`optionbox optionbox-half${archetype == 1 ? ' optionbox-active' : ""}`} 
+												id="archetypeVehicleOption"
+												onClick={
+													( () => {
+														setArchetype(1)
+													}
+													)
+												}>Vehicle</button>
+											<Tooltip anchorSelect="#archetypeVehicleOption" place="right">Archetype</Tooltip>
+											</>
+										)
+										: null
+								}
+							</div>
+
 							<div className='power-cost-container'>
 								{
 									(type == "unit" || type == "token" || type == "hero" || type == "building") ?
@@ -628,6 +669,8 @@ function MakerSidebar(props) {
 							>
 							</textarea></label>
 							<Tooltip anchorSelect="#LoreTextArea" place="right"> Lore </Tooltip>
+
+
 
 							<div className='power-cost-container'>
 								{

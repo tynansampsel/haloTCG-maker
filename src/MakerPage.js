@@ -17,6 +17,7 @@ import applyDepiction from './js/applyDepiction.js'
 import applyWaveIcon from './js/applyWaveImage.js'
 import applyText from './js/applyText.js'
 import applyDepictionFromDataURL from './js/applyDepictionFromDataURL.js'
+import displayUnitIcon from './js/displayUnitIcon.js'
 
 function MakerPage(props) {
 	const [cardDisplaySrc, setCardDisplaySrc] = useState("")
@@ -72,12 +73,14 @@ function MakerPage(props) {
 		let frameType = cardObject.frameType
 
 		const frame = frameTemplates[card.frame]
-		//console.log(card.specials)
-		await applyDepictionFromDataURL(ctx, depiction.dataURL)
+		//console.log(depiction)
+		await applyDepictionFromDataURL(ctx, depiction != undefined ? depiction.dataURL : "")
 		await applyFrame(ctx, card, frame, frameType)
 		await applyWaveIcon(ctx, card, frameType)
 		await displayCost(ctx, card, frameType)
 		await displayRarity(ctx, card, frameType)
+		await displayUnitIcon(ctx, card, frameType)
+		
 		//console.log("A 1")
 
 		await applyText(ctx, card, frame, displayName, frameType)

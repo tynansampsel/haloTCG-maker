@@ -44,6 +44,10 @@ const ability_descriptions = [
 		desc: "require 1 extra wound to die.",
 	},
 	{
+		name: "toughness",
+		desc: "require 1 extra wound to die.",
+	},
+	{
 		name: "defensive",
 		desc: "Cannot attack.",
 	},

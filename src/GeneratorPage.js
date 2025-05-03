@@ -19,6 +19,7 @@ import applyWaveIcon from './js/applyWaveImage.js';
 import applyText from './js/applyText.js';
 import applyCardToSheet from './js/applyCardToSheet.js';
 import displayRarity from './js/displayRarity.js'
+import displayUnitIcon from './js/displayUnitIcon.js'
 
 
 
@@ -97,16 +98,20 @@ function GeneratorPage(props) {
 		let canvas = createCanvas()
 		const ctx = canvas.getContext("2d")
 		var zip = new JSZip();
+			
 
 		for await (let toggle of toggles) {
 			if(!toggle.toggle) continue;
 
 			let cardObject = cardObjects.find((c) => c.type == toggle.name);
+			//if (cardObject)
+			//console.log(cardObject)
+			//console.log(cardObject +" "+toggle.name)
 			let type = cardObject.type
 			let displayName = cardObject.display
 			let frameType = cardObject.frameType
-			let cards = cardObject.cards;
-
+			let cards = cardObject.cards || []
+			console.log(cards)
 
 			for await (let card of cards) {
 				const frame = frameTemplates[card.frame]
@@ -121,7 +126,8 @@ function GeneratorPage(props) {
 				await displayRarity(ctx, card, frameType)
 				await applyText(ctx, card, frame, displayName, frameType)
 				await displayDescriptionText(ctx, card, frame, frameType, true)
-	
+				await displayUnitIcon(ctx, card, frameType)
+
 				const mdataURL = canvas.toDataURL();
 				setCardDisplaySrc(mdataURL)
 				zip.file(`${card.frame}-${card.type}-${card.name}.png`, dataURItoBlob(mdataURL))

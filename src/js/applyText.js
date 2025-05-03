@@ -113,7 +113,7 @@ const applyText = async (ctx, card, frame, type, frametype) => {
         font: "Open Sans", 
         color: frame.typeColor, 
         style: "bolder",
-        x: 50, 
+        x: (frametype === "unit" || frametype === "token") ? 75 : 50, 
         y: typeY, 
         width: 750,
         textAlign: "start"
